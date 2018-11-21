@@ -1,14 +1,31 @@
 package FirstDraft;
 
-public class Heart {
+public class Heart implements Organ {
 
-    boolean functioning;
-    Blood blood;
+    private boolean functioning;
+    private static String name = "heart";
+    private Blood blood;
 
-    Heart(Blood blood){
+    public Heart(Blood blood){
         this.blood = blood;
 
     }
 
+    public static String getName() {
+        return name;
+    }
 
+
+    @Override
+    public void bloodExchange() {
+
+    }
+
+    public boolean isFunctioning() {
+        return functioning;
+    }
+
+    public void setFunctioning(boolean functioning) {
+        this.functioning = functioning;
+    }
 }

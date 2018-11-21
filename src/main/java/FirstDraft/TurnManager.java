@@ -2,21 +2,24 @@ package FirstDraft;
 
 public class TurnManager {
 
-    private Blood blood;
-    private Heart heart;
-    private Lungs lungs;
 
-    public void turnManager() {
-        blood = new Blood();
-        heart = new Heart(blood);
-        lungs = new Lungs(blood);
+    private final Organ[] organs;
+    private final Blood blood;
 
+    TurnManager(Organ[] organs, Blood blood) {
+
+
+        this.organs = organs;
+        this.blood = blood;
     }
 
 
-
     public void manageTurn(){
-        if (heart.functioning) {
+
+
+        for (Organ organ : organs) {
+            if (organs.)
+
 
         }
 

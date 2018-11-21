@@ -1,9 +1,10 @@
 package FirstDraft;
 
-public class Lungs {
+public class Lungs implements Organ {
 
-    Blood blood;
-    boolean functioning;
+    private Blood blood;
+    private static String name = "lungs";
+    private boolean functioning;
 
     int breathsPerMinute;
     double o2perturn;
@@ -13,6 +14,12 @@ public class Lungs {
     Lungs(Blood blood) {
         this.blood = blood;
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
 
     public void bloodExchange() {
 
@@ -31,4 +38,12 @@ public class Lungs {
 
     }
 
+    @Override
+    public boolean isFunctioning() {
+        return functioning;
+    }
+
+    public void setFunctioning(boolean functioning) {
+        this.functioning = functioning;
+    }
 }
