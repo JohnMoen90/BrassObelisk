@@ -31,7 +31,7 @@ public class mainGUI extends JFrame {
 
     mainGUI() {
 
-//        this.body = new Body();
+        this.body = new Body();
 
         setContentPane(optionsPanel);
         pack();

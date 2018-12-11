@@ -35,6 +35,7 @@ public class Blood {
         bodyBlood.setNextEnvironment(pulmonaryBlood);  // Here I skip the fact that the blood goes through the heart before the lungs
         pulmonaryBlood.setNextEnvironment(bloodinHeart);
 
+
         // Save environments into list
         allBloodEnvs.add(bloodinHeart);
         allBloodEnvs.add(bodyBlood);
@@ -99,6 +100,7 @@ public class Blood {
     // Blood Environment
     private class BloodEnvironment{
 
+        // Research Data types, Queue
         private ArrayList<BloodUnit> bloodQueue = new ArrayList<>();
         private BloodEnvironment nextEnvironment;
         private int environmentSize;
@@ -119,6 +121,7 @@ public class Blood {
                 nextEnvironment.add(pop());
             }
         }
+
 
         public BloodUnit pop() {
             return this.bloodQueue.remove(0);
