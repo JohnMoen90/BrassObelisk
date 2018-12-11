@@ -1,6 +1,15 @@
 package FirstDraft;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Blood {
+
+    // Init value result sets
+    ResultSet nutrients;
+    ResultSet wastes;
+
+
 
     /**
      * Healthy individuals at sea level usually exhibit oxygen saturation values between 96% and 99%,
@@ -17,9 +26,27 @@ public class Blood {
      */
     private double co2Saturation;
 
-    public void Blood() {
+    Blood(ResultSet nutrients, ResultSet wastes) {
+        this.nutrients = nutrients;
+        this.wastes = wastes;
+
+        bloodInit();
+
+
         o2Saturation = .970;    // Percentage blood saturation
         co2Saturation = 0.00035; //PPMillion
+    }
+
+    private void bloodInit() {
+        try {
+            while (nutrients.next()) {
+
+            }
+        }
+        catch (SQLException sqle) {
+            System.out.println("Something happened...");
+            sqle.printStackTrace();
+        }
     }
 
     public double getO2Saturation() {

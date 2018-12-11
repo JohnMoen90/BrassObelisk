@@ -1,6 +1,6 @@
 package FirstDraft;
 
-public class Heart implements Organ {
+public class Heart {
 
     private boolean functioning;
     private static String name = "heart";
@@ -11,15 +11,16 @@ public class Heart implements Organ {
 
     }
 
-    public static String getName() {
-        return name;
-    }
+//    @Override
+//    public static String getName() {
+//        return name;
+//    }
 
 
-    @Override
-    public void bloodExchange() {
-
-    }
+//    @Override
+//    public void bloodExchange() {
+//
+//    }
 
     public boolean isFunctioning() {
         return functioning;

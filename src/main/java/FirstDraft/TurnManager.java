@@ -8,7 +8,6 @@ public class TurnManager {
 
     TurnManager(Organ[] organs, Blood blood) {
 
-
         this.organs = organs;
         this.blood = blood;
     }
@@ -18,7 +17,7 @@ public class TurnManager {
 
 
         for (Organ organ : organs) {
-            if (organs.)
+            if (organ.isFunctioning()){}
 
 
         }
