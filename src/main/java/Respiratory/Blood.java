@@ -1,6 +1,8 @@
 package Respiratory;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Blood {
 
@@ -8,14 +10,15 @@ public class Blood {
     private static int bloodIDCounter;
 
     // Initialize blood unit lists
-    private ArrayList<BloodUnit> bloodUnits = new ArrayList<>();
-    private ArrayList<BloodUnit> allBloodUnits = new ArrayList<>();
+    private Queue<BloodUnit> bloodUnits = new LinkedList<>();
+    private Queue<BloodUnit> allBloodUnits = new LinkedList<>();
+    private Queue<BloodUnit> tempQueue = new LinkedList<>();
     private ArrayList<BloodEnvironment> allBloodEnvs = new ArrayList<>();
 
     // Initialize blood environments
-    private BloodEnvironment bodyBlood = new BloodEnvironment("body",BodyConfig.BODY_ENV);
-    private BloodEnvironment pulmonaryBlood = new BloodEnvironment("pulmonary",BodyConfig.LUNG_ENV);
-    private BloodEnvironment bloodinHeart = new BloodEnvironment("heart",BodyConfig.HEART_ENV);
+    private BloodEnvironment pulmonaryBlood;
+    private BloodEnvironment bodyBlood;
+    private BloodEnvironment bloodinHeart;
 
     // Constructor
     Blood(double bodyWeight, double strokeVolume){
@@ -23,12 +26,44 @@ public class Blood {
         bloodIDCounter = 1;
         int BUCount = (int) Math.round((bodyWeight * 70) / strokeVolume) * 10;
 
-        // Generate blood object for each decaliter of blood
+        // Generate blood object for each decilitre of blood
         for (int i = 0; i < BUCount; i++) {
             bloodUnits.add(new BloodUnit());
             allBloodUnits.add(new BloodUnit());
             bloodIDCounter++;
         }
+        System.out.println("Total BUs: " + bloodUnits.size());
+
+
+        // %10 BUs in lungs
+        for (int i = 0; i < BUCount * .1; i++) {
+
+            tempQueue.add(bloodUnits.remove());
+        }
+        pulmonaryBlood = new BloodEnvironment("pulmonary",BodyConfig.LUNG_ENV, tempQueue);
+        tempQueue.clear();
+
+
+        // strokeVolume * 10 in Heart
+        for (int i = 0; i < Math.round(strokeVolume / 10); i++) {
+            System.out.println("Total BUs: " + bloodUnits.size());
+            System.out.println("Temp BUs: " + tempQueue.size());
+            tempQueue.add(bloodUnits.remove());
+        }
+        bloodinHeart = new BloodEnvironment("pulmonary",BodyConfig.LUNG_ENV, tempQueue);
+        tempQueue.clear();
+
+
+        // Rest in body
+        for (int i = 0; i < bloodUnits.size(); i++) {
+            tempQueue.add(bloodUnits.remove());
+        }
+        bodyBlood = new BloodEnvironment("body",BodyConfig.BODY_ENV, tempQueue);
+        tempQueue.clear();
+
+
+//        System.out.println("Total BUs: " + bloodUnits.size());
+//        System.out.println("Body BUs: " + bodyBlood.getSize());
 
         // Set circulatory loop
         bloodinHeart.setNextEnvironment(bodyBlood);
@@ -37,24 +72,10 @@ public class Blood {
 
 
         // Save environments into list
+
         allBloodEnvs.add(bloodinHeart);
         allBloodEnvs.add(bodyBlood);
         allBloodEnvs.add(pulmonaryBlood);
-
-        // %10 BUs in lungs
-        for (int i = 0; i < BUCount * .1; i++) {
-            pulmonaryBlood.add(bloodUnits.remove(0));
-        }
-
-        // strokeVolume * 10 in Heart
-        for (int i = 0; i < Math.round(strokeVolume * 10); i++) {
-            bloodinHeart.add(bloodUnits.remove(0));
-        }
-
-        // Rest in body
-        for (int i = 0; i < bloodUnits.size(); i++) {
-            bodyBlood.add(bloodUnits.remove(0));
-        }
 
         // Set bloodEnvironment size limits
         bloodinHeart.setEnvironmentSize(bloodinHeart.getSize());
@@ -65,12 +86,14 @@ public class Blood {
 
 
     public double getReading(int bloodEnvID, String reading){
+
+        //
         for (BloodEnvironment bloodEnv : allBloodEnvs) {
             if (bloodEnv.getBloodEnvID() == bloodEnvID) {
                 if (reading.equals("po2")) {
-                    return bloodEnv.bloodQueue.get(0).po2;
+                    return bloodEnv.bloodQueue.remove().po2;
                 } else if (reading.equals("o2")) {
-                    return bloodEnv.bloodQueue.get(0).pco2;
+                    return bloodEnv.bloodQueue.remove().pco2;
                 }
             }
         }
@@ -82,7 +105,7 @@ public class Blood {
         int BUsPerPump = bloodinHeart.getSize();
 
         for (int i = 0; i < BUsPerPump; i++) {
-            bloodinHeart.nextEnvironment.add(bloodinHeart.pop());
+            bloodinHeart.nextEnvironment.add(bloodinHeart.bloodQueue.remove());
         }
 
     }
@@ -101,7 +124,7 @@ public class Blood {
     private class BloodEnvironment{
 
         // Research Data types, Queue
-        private ArrayList<BloodUnit> bloodQueue = new ArrayList<>();
+        private Queue<BloodUnit> bloodQueue;
         private BloodEnvironment nextEnvironment;
         private int environmentSize;
         private String name;
@@ -109,42 +132,28 @@ public class Blood {
         private double po2;
         private double pco2;
 
-        BloodEnvironment(String name, int bloodEnvID){
+        BloodEnvironment(String name, int bloodEnvID, Queue<BloodUnit> bloodQueue){
             this.name = name;
             this.bloodEnvID = bloodEnvID;
+            this.bloodQueue = bloodQueue;
         }
+
+
 
         // Manage blood unit inventory
         public void add(BloodUnit bu) {
-            this.bloodQueue.add(bu);
-            if (this.bloodQueue.size() != this.environmentSize) {
-                nextEnvironment.add(pop());
-            }
+            bloodQueue.add(bu);
+
+            //
+//            if (this.bloodQueue.size() > this.environmentSize) {
+//                nextEnvironment.bloodQueue.add(bloodQueue.remove());
+//            }
         }
 
-
-        public BloodUnit pop() {
-            return this.bloodQueue.remove(0);
-        }
-
-        public void push(BloodUnit bu) {
-            this.bloodQueue.add(bu);
-        }
-
+        // Get the size of the queue
         public int getSize(){
             return this.bloodQueue.size();
         }
-
-        public void printBloodQueue(){
-            String pstring = name + "\n----------";
-            for (int i = 0; i < getSize(); i++) {
-                pstring += bloodQueue.get(i).toString();
-            }
-
-            System.out.println(pstring);
-
-        }
-
 
         public double getPo2() {
             return po2;
@@ -206,6 +215,8 @@ public class Blood {
 
             return "ID: " + bloodID + " PO2: " + this.po2  + " PCo2: " + this.pco2 + "...\n";
         }
+
+
 
 
         public double getPo2() {

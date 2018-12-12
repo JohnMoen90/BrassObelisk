@@ -69,6 +69,29 @@ public class mainGUI extends JFrame {
         });
 
     }
+
+    private class dataReader{
+
+        private double PvO2;
+        private double PvCO2;
+        private double PaO2;
+        private double PaCO2;
+
+
+        // Gets reading from the LAST object in queue
+        public void getReadings(){
+
+
+            PvO2 = body.blood.getReading(2,"po2");
+            PvCO2 = body.blood.getReading(2,"pco2");
+
+            PvO2 = body.blood.getReading(0,"po2");
+            PvCO2 = body.blood.getReading(0,"pco2");
+
+        }
+    }
+
+
 }
 
 
