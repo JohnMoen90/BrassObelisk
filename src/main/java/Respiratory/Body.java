@@ -3,13 +3,10 @@ package Respiratory;
 public class Body {
 
     // Initialize some variables
-    private double bodyWeight = BodyConfig.bodyWeight;
     Blood blood; // ml
+    private double bodyWeight = BodyConfig.bodyWeight;
     private double Vo2 = (17 * bodyWeight) / 60; // ml perSecond
     private double Vco2 = (1.1 * bodyWeight) / 60; // ml perSecond
-
-    // Variables to store readings from blood
-
 
 
     // Constructor
@@ -18,8 +15,10 @@ public class Body {
     }
 
 
+    // Manage the reality of passing time each turn
     public void manageTurn(){
         blood.circulate();
+        blood.diffuse("maj");
     }
 
 

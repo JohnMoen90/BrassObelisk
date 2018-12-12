@@ -17,4 +17,9 @@ public class BodyConfig {
     static int LUNG_ENV = 1;
     static int BODY_ENV = 2;
 
+    static double bodyCo2 = 45;
+    static double bodyo2 = 60;
+    static double lungCo2 = 40;
+    static double lungo2 = 100;
+
 }
