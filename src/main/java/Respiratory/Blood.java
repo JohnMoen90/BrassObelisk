@@ -4,72 +4,89 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * The Blood class handles the transfer of nutrients and wastes throughout the body using two major components -
+ *      BloodUnits          - Each representing roughly 10ml of blood, all moving and containing nutrients as one
+ *      BloodEnvironment    - Feature-rich queues for the blood units that circulate contents starting at heart
+ */
 public class Blood {
 
-    // Blood counter for blood unit IDs
-    private static int bloodIDCounter;
-
-    // Initialize blood unit lists
-    private Queue<BloodUnit> bloodUnits = new LinkedList<>();
     private Queue<BloodUnit> allBloodUnits = new LinkedList<>();
     private ArrayList<BloodEnvironment> allBloodEnvs = new ArrayList<>();
 
-    // Initialize blood environments
     private BloodEnvironment pulmonaryBlood;
     private BloodEnvironment bodyBlood;
     private BloodEnvironment bloodInHeart;
 
-    // Diffusion rates
+    // Diffusion rates  TODO: Move these to BodyConfig
     private double co2DiffusionRate = .2;
     private double o2DiffusionRate = .08;
 
+    private static int bloodIDCounter;  // Each bloodUnit has an ID number for easy access
 
-    // Constructor
+    private double strokeVolume;
+
+
+    /**
+     * This constructor initializes all the blood units, splits the Blood Units into each bloo environment, and sets
+     * all the starting variables from BodyConfig.
+     * @param bodyWeight Determines how much blood there is.
+     * @param strokeVolume Determines the size of the blood unit and how many blood units are pumped per pump
+     */
     Blood(double bodyWeight, double strokeVolume){
 
-        // Set some local variables
-        bloodIDCounter = 1;
-        int BUCount = (int) Math.round((bodyWeight * 70) / strokeVolume) * 10;
-        Queue<BloodUnit> tempQueue = new LinkedList<>();
+        this.strokeVolume = strokeVolume;
 
-        // Generate blood object for each decilitre of blood
+        Queue<BloodUnit> bloodUnits = new LinkedList<>();   // A list for all bloodUnits before transfer into Temp Queue
+
+        // bodyWeight * 70 is the blood volume, strokeVolume is the BloodUnit size, and the * ten converts ml to dl
+        int BUCount = (int) Math.round((bodyWeight * 70) / strokeVolume) * 10;
         for (int i = 0; i < BUCount; i++) {
             bloodUnits.add(new BloodUnit());
-            bloodIDCounter++;
         }
 
+        // Basically one initializer for bloodUnits and one for bloodEnvironments
+        initializeBloodEnvironmentQueues(bloodUnits);
+        initializeBloodEnvironments();
 
-        // %10 BUs in lungs
-        for (int i = 0; i < BUCount * .1; i++) {
+    }
+
+    /**
+     * Takes the blood units list generated in the constructor and distributes them amongst bloodEnvironments
+     * @param bloodUnits
+     */
+    public void initializeBloodEnvironmentQueues(Queue<BloodUnit> bloodUnits){
+
+        Queue<BloodUnit> tempQueue = new LinkedList<>();    // Temp queue for loading bloodUnits to blood environments
+        bloodIDCounter = 1;
+
+        // Lungs
+        for (int i = 0; i < bloodUnits.size() * .1; i++) {    // Lungs contain 10% of the body's blood at any given time
             tempQueue.add(bloodUnits.remove());
         }
         pulmonaryBlood = new BloodEnvironment("pulmonary",BodyConfig.LUNG_ENV, tempQueue);
         tempQueue.clear();
 
 
-        // strokeVolume * 10 in Heart
-        for (int i = 0; i < Math.round(strokeVolume / 10); i++) {
+        // Heart
+        for (int i = 0; i < Math.round(strokeVolume / 10); i++) {   // Stroke volume converted to decilitres
             tempQueue.add(bloodUnits.remove());
         }
         bloodInHeart = new BloodEnvironment("heart",BodyConfig.HEART_ENV, tempQueue);
         tempQueue.clear();
 
 
-        // Rest in body
-        for (int i = 0; i < bloodUnits.size(); i++) {
+        // Body
+        for (int i = 0; i < bloodUnits.size(); i++) {   // Put everything left in body environment
             tempQueue.add(bloodUnits.remove());
         }
         bodyBlood = new BloodEnvironment("body",BodyConfig.BODY_ENV, tempQueue);
-        tempQueue.clear();
-
-        System.out.println(pulmonaryBlood.toString());
-
-        // Initialize Blood Environments
-        initializeBloodEnvironments();
-
-
     }
 
+
+    /**
+     * This method focuses on non-bloodQueue bloodEnvironment variables
+     */
     public void initializeBloodEnvironments(){
 
         // Set circulatory loop
@@ -77,7 +94,7 @@ public class Blood {
         bodyBlood.setNextEnvironment(pulmonaryBlood);  // Here I skip the fact that the blood goes through the heart before the lungs
         pulmonaryBlood.setNextEnvironment(bloodInHeart);
 
-        // Set initial bloodEnvironment values --> 0:heart, 1:lungs, 2:body
+        // Set initial bloodEnvironment values
         setBloodEnvironmentPressures(bloodInHeart, BodyConfig.bodyo2, BodyConfig.bodyCo2);
         setBloodEnvironmentPressures(pulmonaryBlood, BodyConfig.lungo2, BodyConfig.lungCo2);
         setBloodEnvironmentPressures(bodyBlood, BodyConfig.bodyo2, BodyConfig.bodyCo2);
@@ -95,7 +112,12 @@ public class Blood {
     }
 
 
-
+    /**
+     * This is a temporary way of getting pO2 and pCO2 readings from blood queues.
+     * @param bloodEnvID The bloodEnvironment you'd like to query
+     * @param reading A choice between pO2 and Pco2 TODO add an enum for these values
+     * @return the value in mmHg
+     */
     public double getReading(int bloodEnvID, String reading){
 
         //
@@ -108,60 +130,62 @@ public class Blood {
                 }
             }
         }
-        return 0.0;
+        return 0.0; // This should never happen
     }
 
-    //Circulate blood
+    /**
+     * Moves blood from heart to next bloodEnvironment, starting a chain reaction facilitated by add() method
+     */
     public void circulate(){
-        int BUsPerPump = bloodInHeart.getSize();
 
+        int BUsPerPump = bloodInHeart.getSize();
         for (int i = 0; i < BUsPerPump; i++) {
             bloodInHeart.nextEnvironment.add(bloodInHeart.bloodQueue.remove());
-            diffuse("min");
+            diffuse("min");     // A small amount of diffusion happens between pumps
         }
 
         System.out.println(allBloodUnits.peek().po2);
 
     }
 
-    // Diffuse blood unit gas pressures into current environment
+
+    /**
+     * This method equalizes gas pressures between every blood unit and their environment
+     * @param diffusionLengthSelector if "min" is passed, then only a small amount of diffusion happens
+     */
     public void diffuse(String diffusionLengthSelector){
 
         // Set diffusionLength
         double diffusionLength = 1;
         if (diffusionLengthSelector.equals("min")) {
-            diffusionLength = .1;
+            diffusionLength = .02;
         }
 
 
-        // Loop through each environment
+        // Loop through every blood unit
         for (BloodEnvironment bloodEnvironment: allBloodEnvs) {
-
-            // Loop through each blood unit
             for (BloodUnit bloodUnit: bloodEnvironment.bloodQueue) {
 
                 // Calculate the difference between pressure values
                 double co2Difference = Math.abs(bloodUnit.getPco2() - bloodEnvironment.pco2);
                 double o2Difference = Math.abs(bloodUnit.getPo2() - bloodEnvironment.po2);
 
-                // If there is more CO2 in blood
+                // Equalize CO2
                 if (bloodUnit.getPco2() > bloodEnvironment.pco2) {
                     bloodUnit.setPco2((bloodUnit.getPco2() - .1 - (co2Difference * co2DiffusionRate * diffusionLength)));
-                // If there is more CO2 in environment
                 } else if (bloodUnit.getPco2() < bloodEnvironment.pco2) {
                     bloodUnit.setPco2((bloodUnit.getPco2() + .1 + (co2Difference * co2DiffusionRate * diffusionLength)));
                 }
 
-                // If there is more O2 in blood
+                // Equalize O2
                 if (bloodUnit.getPo2() > bloodEnvironment.po2) {
                     bloodUnit.setPo2((bloodUnit.getPo2() - .1 - (o2Difference * o2DiffusionRate * diffusionLength)));
-                // If there is more O2 in environment
                 } else if (bloodUnit.getPo2() < bloodEnvironment.po2) {
                     bloodUnit.setPo2((bloodUnit.getPo2() + .1 + (o2Difference * co2DiffusionRate * diffusionLength)));
                 }
 
-                // Test a blood unit
-                if (bloodUnit.bloodID == 2 & diffusionLength == 1) {
+                // Prints bloodUnit stats for the same bloodUnit each diffusion cycle for testing reasons
+                if (bloodUnit.bloodID == 2 & diffusionLength == 1) {    // Only print on normal diffusion calls
                     System.out.println("--------------------------------");
                     System.out.printf("Environment:         %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
                     System.out.printf("Environment co2:     %s\n", bloodUnit.getCurrentEnvironment().pco2);
@@ -181,54 +205,60 @@ public class Blood {
     }
 
 
-    // Set Environmental Variables
+    /**
+     *
+     * @param bloodEnvironment the bloodEnvironment you'd like to set values to
+     * @param po2Value  the oxygen value, a 0 means don't change current value
+     * @param pco2Value the co2Value, a 0 means don't change the current value
+     */
     public void setBloodEnvironmentPressures(BloodEnvironment bloodEnvironment, double po2Value, double pco2Value){
-
-        System.out.printf("%s\n",bloodEnvironment.name);
-        System.out.printf("po2Value - %.2f\n",po2Value);
-        System.out.printf("pco2Value - %.2f\n",pco2Value);
-
-        bloodEnvironment.setPo2(po2Value);
-        bloodEnvironment.setPco2(pco2Value);
-
-        System.out.printf("\n%s.po2value - %.2f\n",bloodEnvironment.name, po2Value);
-        System.out.printf("\n%s.pco2value - %.2f\n",bloodEnvironment.name, pco2Value);
-
-
-
+        if (po2Value != 0) {
+            bloodEnvironment.setPo2(po2Value);
+        }
+        if (pco2Value != 0) {
+            bloodEnvironment.setPco2(pco2Value);
+        }
     }
 
 
-    // Blood Environment
+    /**
+     * This class is basically a feature rich Queue which equalizes gas pressures with contained bloodUnits
+     */
     private class BloodEnvironment{
 
-        // Research Data types, Queue
         private Queue<BloodUnit> bloodQueue;
         private BloodEnvironment nextEnvironment;
         private int environmentSize;
-        private String name;
-        private int bloodEnvID;
+        private String name;    // Helpful to access specific bloodEnvironment sometimes
+        private int bloodEnvID; // Another way to access specific bloodEnvironments; heart - 0, lungs - 1, body - 2
         private double po2;
         private double pco2;
 
-        // Constructor
+
         BloodEnvironment(String name, int bloodEnvID, Queue<BloodUnit> bloodQueue){
             this.name = name;
             this.bloodEnvID = bloodEnvID;
-            this.bloodQueue = new LinkedList<>();
-            this.bloodQueue.addAll(bloodQueue);
+
+            this.bloodQueue = new LinkedList<>();   //<-- This technique allows the tempQueue in
+            this.bloodQueue.addAll(bloodQueue);     //    initializeBloodEnvironment() to be reused
         }
 
 
-        // Manage blood unit inventory
-        public void add(BloodUnit bu) {
-            bloodQueue.add(bu);
+        /**
+         * Whenever a bloodUnit is added to Queue, the head of the Queue is pushed to the nextEnvironment
+         * @param bloodUnit Usually the head of the preceding bloodEnvironment
+         */
+        public void add(BloodUnit bloodUnit) {
+            bloodQueue.add(bloodUnit);
             if (this.bloodQueue.size() > this.environmentSize) {
                 nextEnvironment.add(bloodQueue.remove());
             }
         }
 
-        // Get the size of the queue
+        /**
+         * Get bloodQueue size
+         * @return the size of the bloodEnvironment's bloodQueue
+         */
         public int getSize(){
             return this.bloodQueue.size();
         }
@@ -273,23 +303,13 @@ public class Blood {
             this.bloodEnvID = bloodEnvID;
         }
 
-        @Override
-        public String toString(){
-
-            String returnString = "";
-            for (BloodUnit bu: bloodQueue) {
-                returnString += bu.toString() + "\n";
-            }
-
-            return returnString;
-        }
-
-
     }
 
 
-
-    // Innerclass for blood units
+    /**
+     * Blood units represent 10 ml of blood and each have their own nutrient/waste values
+     * They can be accessed from their bloodEnvironment bloodQueue positions or by their ID numbers
+     */
     private class BloodUnit{
         private int bloodID;
         private double po2;
@@ -298,17 +318,16 @@ public class Blood {
         BloodUnit(){
             this.po2 = 100; // mmHg
             this.pco2 = 40; // mmHg
-            this.bloodID = bloodIDCounter + 1;
+            this.bloodID = bloodIDCounter;
+            bloodIDCounter++;
             allBloodUnits.add(this);
         }
 
-        @Override
-        public String toString(){
 
-            return "ID: " + bloodID + " PO2: " + this.po2  + " PCo2: " + this.pco2 + "...\n";
-        }
-
-
+        /**
+         * Useful for testing
+         * @return the bloodEnvironment a bloodUnit is currently in
+         */
         public BloodEnvironment getCurrentEnvironment(){
 
             for (BloodEnvironment bloodEnvironment: allBloodEnvs) {
