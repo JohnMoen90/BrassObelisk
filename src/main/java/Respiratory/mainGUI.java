@@ -46,6 +46,7 @@ public class mainGUI extends JFrame {
         }
 
 
+
         // Set up the timer
         new Timer(1000, new ActionListener() {
             @Override
@@ -56,14 +57,6 @@ public class mainGUI extends JFrame {
                 }
             }
         }).start();
-
-
-        StartButton.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-
-            }
-        });
 
 
         // add start button listener

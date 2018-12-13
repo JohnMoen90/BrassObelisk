@@ -78,9 +78,9 @@ public class Blood {
         pulmonaryBlood.setNextEnvironment(bloodInHeart);
 
         // Set initial bloodEnvironment values --> 0:heart, 1:lungs, 2:body
-        setBloodEnvironmentPressures(0, BodyConfig.bodyo2, BodyConfig.bodyCo2);
-        setBloodEnvironmentPressures(1, BodyConfig.lungo2, BodyConfig.lungCo2);
-        setBloodEnvironmentPressures(2, BodyConfig.bodyo2, BodyConfig.bodyCo2);
+        setBloodEnvironmentPressures(bloodInHeart, BodyConfig.bodyo2, BodyConfig.bodyCo2);
+        setBloodEnvironmentPressures(pulmonaryBlood, BodyConfig.lungo2, BodyConfig.lungCo2);
+        setBloodEnvironmentPressures(bodyBlood, BodyConfig.bodyo2, BodyConfig.bodyCo2);
 
         // Save environments into list
         allBloodEnvs.add(bloodInHeart);
@@ -102,9 +102,6 @@ public class Blood {
         for (BloodEnvironment bloodEnv : allBloodEnvs) {
             if (bloodEnv.getBloodEnvID() == bloodEnvID) {
                 if (reading.equals("po2")) {
-                    System.out.println("bloodEnv size"+bloodEnv.bloodQueue.size());
-                    System.out.println(""+bloodEnv.bloodQueue.peek().po2);
-                    System.out.println(""+bloodEnv.bloodQueue.peek().po2);
                     return bloodEnv.bloodQueue.peek().po2;
                 } else if (reading.equals("pco2")) {
                     return bloodEnv.bloodQueue.peek().pco2;
@@ -163,6 +160,21 @@ public class Blood {
                     bloodUnit.setPo2((bloodUnit.getPo2() + .1 + (o2Difference * co2DiffusionRate * diffusionLength)));
                 }
 
+                // Test a blood unit
+                if (bloodUnit.bloodID == 2 & diffusionLength == 1) {
+                    System.out.println("--------------------------------");
+                    System.out.printf("Environment:         %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
+                    System.out.printf("Environment co2:     %s\n", bloodUnit.getCurrentEnvironment().pco2);
+                    System.out.printf("Environment o2:      %s\n", bloodUnit.getCurrentEnvironment().po2);
+                    System.out.printf("o2 difference:       %.2f\n", o2Difference);
+                    System.out.printf("co2 difference:      %.2f\n", co2Difference);
+                    System.out.printf("BloodUnit o2:        %.2f\n", bloodUnit.getPo2());
+                    System.out.printf("BloodUnit co2:       %.2f\n", bloodUnit.getPco2());
+                    System.out.printf("Diffusion length:    %.2f\n", diffusionLength);
+                    System.out.println("--------------------------------");
+
+                }
+
             }
         }
 
@@ -170,14 +182,19 @@ public class Blood {
 
 
     // Set Environmental Variables
-    public void setBloodEnvironmentPressures(int bloodEnvironmentID, double po2Value, double pco2Value){
+    public void setBloodEnvironmentPressures(BloodEnvironment bloodEnvironment, double po2Value, double pco2Value){
 
-        for (BloodEnvironment bloodEnvironment: allBloodEnvs) {
-            if (bloodEnvironment.getBloodEnvID() == bloodEnvironmentID) {
-                bloodEnvironment.setPo2(po2Value);
-                bloodEnvironment.setPco2(pco2Value);
-            }
-        }
+        System.out.printf("%s\n",bloodEnvironment.name);
+        System.out.printf("po2Value - %.2f\n",po2Value);
+        System.out.printf("pco2Value - %.2f\n",pco2Value);
+
+        bloodEnvironment.setPo2(po2Value);
+        bloodEnvironment.setPco2(pco2Value);
+
+        System.out.printf("\n%s.po2value - %.2f\n",bloodEnvironment.name, po2Value);
+        System.out.printf("\n%s.pco2value - %.2f\n",bloodEnvironment.name, pco2Value);
+
+
 
     }
 
@@ -292,6 +309,18 @@ public class Blood {
         }
 
 
+        public BloodEnvironment getCurrentEnvironment(){
+
+            for (BloodEnvironment bloodEnvironment: allBloodEnvs) {
+                for (BloodUnit bu : bloodEnvironment.bloodQueue) {
+                    if (bu.equals(this)) {
+                        return bloodEnvironment;
+                    }
+                }
+            }
+
+            return null;
+        }
 
 
         public double getPo2() {
