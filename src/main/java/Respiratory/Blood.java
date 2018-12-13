@@ -35,7 +35,6 @@ public class Blood {
         // Generate blood object for each decilitre of blood
         for (int i = 0; i < BUCount; i++) {
             bloodUnits.add(new BloodUnit());
-            allBloodUnits.add(new BloodUnit());
             bloodIDCounter++;
         }
 
@@ -63,6 +62,7 @@ public class Blood {
         bodyBlood = new BloodEnvironment("body",BodyConfig.BODY_ENV, tempQueue);
         tempQueue.clear();
 
+        System.out.println(pulmonaryBlood.toString());
 
         // Initialize Blood Environments
         initializeBloodEnvironments();
@@ -102,9 +102,12 @@ public class Blood {
         for (BloodEnvironment bloodEnv : allBloodEnvs) {
             if (bloodEnv.getBloodEnvID() == bloodEnvID) {
                 if (reading.equals("po2")) {
-                    return bloodEnv.bloodQueue.remove().po2;
-                } else if (reading.equals("o2")) {
-                    return bloodEnv.bloodQueue.remove().pco2;
+                    System.out.println("bloodEnv size"+bloodEnv.bloodQueue.size());
+                    System.out.println(""+bloodEnv.bloodQueue.peek().po2);
+                    System.out.println(""+bloodEnv.bloodQueue.peek().po2);
+                    return bloodEnv.bloodQueue.peek().po2;
+                } else if (reading.equals("pco2")) {
+                    return bloodEnv.bloodQueue.peek().pco2;
                 }
             }
         }
@@ -117,7 +120,10 @@ public class Blood {
 
         for (int i = 0; i < BUsPerPump; i++) {
             bloodInHeart.nextEnvironment.add(bloodInHeart.bloodQueue.remove());
+            diffuse("min");
         }
+
+        System.out.println(allBloodUnits.peek().po2);
 
     }
 
@@ -176,7 +182,6 @@ public class Blood {
     }
 
 
-
     // Blood Environment
     private class BloodEnvironment{
 
@@ -193,7 +198,8 @@ public class Blood {
         BloodEnvironment(String name, int bloodEnvID, Queue<BloodUnit> bloodQueue){
             this.name = name;
             this.bloodEnvID = bloodEnvID;
-            this.bloodQueue = bloodQueue;
+            this.bloodQueue = new LinkedList<>();
+            this.bloodQueue.addAll(bloodQueue);
         }
 
 
@@ -201,7 +207,7 @@ public class Blood {
         public void add(BloodUnit bu) {
             bloodQueue.add(bu);
             if (this.bloodQueue.size() > this.environmentSize) {
-                nextEnvironment.bloodQueue.add(bloodQueue.remove());
+                nextEnvironment.add(bloodQueue.remove());
             }
         }
 
@@ -249,6 +255,19 @@ public class Blood {
         public void setBloodEnvID(int bloodEnvID) {
             this.bloodEnvID = bloodEnvID;
         }
+
+        @Override
+        public String toString(){
+
+            String returnString = "";
+            for (BloodUnit bu: bloodQueue) {
+                returnString += bu.toString() + "\n";
+            }
+
+            return returnString;
+        }
+
+
     }
 
 
@@ -263,6 +282,7 @@ public class Blood {
             this.po2 = 100; // mmHg
             this.pco2 = 40; // mmHg
             this.bloodID = bloodIDCounter + 1;
+            allBloodUnits.add(this);
         }
 
         @Override

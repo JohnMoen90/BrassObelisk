@@ -1,6 +1,8 @@
 package Respiratory;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -8,90 +10,88 @@ import java.awt.event.ActionListener;
 public class mainGUI extends JFrame {
 
     // Items in GUI
-    private JPanel optionsPanel;
-    private JCheckBox smokerCheckBox;
+    private JPanel mainPanel;
     private JComboBox<String> phyTrainingComboBox;
     private String[] phyTrainingOptions = {"No training", "Little Training", "Moderate Training", "Highly Trained"};
-    private JTextField textField1;
     private JButton StartButton;
-    private JPanel mainPanel;
-    private JPanel resultsPanel;
-    private JLabel PvCO2Label;
-    private JLabel PvO2Label;
-    private JLabel PaO2Label;
-    private JLabel PaCO2Label;
+    private JCheckBox smokerCheckBox;
+    private JTextField bodyWieghtTextField;
     private boolean running;
+
+    // Connection to displayGUI
+    private displayGUI displayGUI;
 
     // The Body
     private Body body;
-    private double PvO2Value;
-    private double PvCO2Value;
-    private double PaO2Value;
-    private double PaCO2Value;
+
+    // Hopefully simulation thread
+
+
 
     mainGUI() {
 
+        // Initialize body and displayGUI
         this.body = new Body();
+        this.displayGUI = new displayGUI(body, this);
 
-        setContentPane(optionsPanel);
+        // JPanel initialization
+        setContentPane(mainPanel);
         pack();
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        // Set up Phy Training ComboBox
         for (String option : phyTrainingOptions) {
             phyTrainingComboBox.addItem(option);
         }
 
-        while (running) {
 
-            // This is where I link together program and GUI
+        // Set up the timer
+        new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (running) {
+                    body.manageTurn();
+                    displayGUI.getReadings();
+                }
+            }
+        }).start();
 
 
+        StartButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
 
-            PvCO2Label.setText(String.format("%f",PvCO2Value));
-            PvO2Label.setText(String.format("%f",PvO2Value));
-            PaCO2Label.setText(String.format("%f",PaCO2Value));
-            PaO2Label.setText(String.format("%f",PaO2Value));
-        }
+            }
+        });
 
+
+        // add start button listener
         StartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 if (!running) {
-                    running = true;
                     StartButton.setText("Stop");
+                    running = true;
                 } else {
-                    running = false;
                     StartButton.setText("Start");
+                    running = false;
                 }
+
+
             }
         });
 
+
     }
 
-    private class dataReader{
 
-        private double PvO2;
-        private double PvCO2;
-        private double PaO2;
-        private double PaCO2;
-
-
-        // Gets reading from the LAST object in queue
-        public void getReadings(){
-
-
-            PvO2 = body.blood.getReading(2,"po2");
-            PvCO2 = body.blood.getReading(2,"pco2");
-
-            PvO2 = body.blood.getReading(0,"po2");
-            PvCO2 = body.blood.getReading(0,"pco2");
-
-        }
-    }
 
 
 }
+
+
+
 
 
