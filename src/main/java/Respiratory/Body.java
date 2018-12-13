@@ -30,8 +30,12 @@ public class Body {
 
     private class Lungs{
 
-        private double tlc = BodyConfig.totalLungCapacity;
+        private double totalLungCapacity = BodyConfig.totalLungCapacity;
+        private double conductingZone = totalLungCapacity * .8;
+        private double respiratoryZone = totalLungCapacity * .2;
         double currentLungVolume;
+
+
 
 
 
