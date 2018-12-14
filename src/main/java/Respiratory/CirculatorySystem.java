@@ -13,9 +13,7 @@ public class CirculatorySystem {
 
     public class BloodEnvironment{}
 
-
         Queue<BloodUnit> bloodQueue = new LinkedList<>();
-
 
 }
 

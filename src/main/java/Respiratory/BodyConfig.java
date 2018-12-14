@@ -13,13 +13,15 @@ public class BodyConfig {
 
 
     // Blood environment
-    static int HEART_ENV = 0;
-    static int LUNG_ENV = 1;
-    static int BODY_ENV = 2;
+    static int HEART_ENV_ID = 0;
+    static int ART_ENV_ID = 1;
+    static int DIFFZONE_ENV_ID = 2;
+    static int VEN_ENV_ID = 3;
+    static int LUNG_ENV_ID = 4;
 
-    static double bodyCo2 = 45;
-    static double bodyo2 = 60;
+    static double diffZoneCo2 = 45;
+    static double diffZoneO2 = 60;
     static double lungCo2 = 40;
-    static double lungo2 = 100;
+    static double lungO2 = 100;
 
 }

@@ -59,6 +59,7 @@ public class Body {
         private double conductingZone = totalLungCapacity * .8;
         private double respiratoryZone = totalLungCapacity * .2;    // <-- This is where gas exchange happens
 
+
         public Lungs() {
 
         }

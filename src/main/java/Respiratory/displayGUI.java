@@ -31,7 +31,7 @@ public class displayGUI extends JFrame{
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        getReadings();
+//        getReadings();
 
 
 
