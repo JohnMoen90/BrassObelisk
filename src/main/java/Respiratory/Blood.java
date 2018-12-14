@@ -81,19 +81,19 @@ public class Blood {
         tempQueue.clear();
 
 
-        // Diffusion zones are any organ/capillary system that engages in gas exchange
-        for (int i = 0; i < Math.round(bloodUnitTotal * .2); i++) {   // Around 20 percent of total blood excluding lungs
-            tempQueue.add(bloodUnits.remove());
-        }
-        diffusionZones = new BloodEnvironment("body",BodyConfig.DIFFZONE_ENV_ID, tempQueue);
-        tempQueue.clear();
-
-
         // Arterial Circulation - 30% of blood in free circulation
         for (int i = 0; i < Math.round(bloodUnits.size() * .3); i++) {   // Stroke volume converted to decilitres
             tempQueue.add(bloodUnits.remove());
         }
-        arterialBlood = new BloodEnvironment("heart",BodyConfig.HEART_ENV_ID, tempQueue);
+        arterialBlood = new BloodEnvironment("arteries",BodyConfig.ART_ENV_ID, tempQueue);
+        tempQueue.clear();
+
+
+        // Diffusion zones are any organ/capillary system that engages in gas exchange
+        for (int i = 0; i < Math.round(bloodUnitTotal * .15); i++) {   // Around 20 percent of total blood excluding lungs
+            tempQueue.add(bloodUnits.remove());
+        }
+        diffusionZones = new BloodEnvironment("diffusionZones",BodyConfig.DIFFZONE_ENV_ID, tempQueue);
         tempQueue.clear();
 
 
@@ -101,14 +101,14 @@ public class Blood {
         for (int i = 0; i < bloodUnits.size(); i++) {   // Stroke volume converted to decilitres
             tempQueue.add(bloodUnits.remove());
         }
-        venousBlood = new BloodEnvironment("heart",BodyConfig.HEART_ENV_ID, tempQueue);
+        venousBlood = new BloodEnvironment("veins",BodyConfig.VEIN_ENV_ID, tempQueue);
         tempQueue.clear();
 
         System.out.println(pulmonaryBlood.bloodQueue);
+        System.out.println(bloodInHeart.bloodQueue);
         System.out.println(arterialBlood.bloodQueue);
         System.out.println(diffusionZones.bloodQueue);
         System.out.println(venousBlood.bloodQueue);
-        System.out.println(bloodInHeart.bloodQueue);
 
     }
 

@@ -16,7 +16,7 @@ public class BodyConfig {
     static int HEART_ENV_ID = 0;
     static int ART_ENV_ID = 1;
     static int DIFFZONE_ENV_ID = 2;
-    static int VEN_ENV_ID = 3;
+    static int VEIN_ENV_ID = 3;
     static int LUNG_ENV_ID = 4;
 
     static double diffZoneCo2 = 45;

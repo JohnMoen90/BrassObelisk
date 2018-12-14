@@ -1,7 +1,5 @@
 package Respiratory;
 
-import javax.swing.*;
-
 /**
  * The Body class manages the inner body components - blood, lungs, heart, and cns or central nervous system
  * All variables that the user can influence are imported from BodyConfig and mainGUI
@@ -89,7 +87,11 @@ public class Body {
 
         }
 
-        private int calculateHeartRate(){
+        /**
+         * Converts the BPM to to appropriate counter value, which is .1 seconds each tick.
+         * @return
+         */
+        private int calculateHeartRate(){   // <-- Float is fine here since the evaluation is >=
             return (600 / beatsPerMinute);
         }
 
