@@ -34,8 +34,9 @@ public class Body {
      */
     public void manageTurn(){
 
-        blood.circulate();
-        blood.diffuse("maj");
+        blood.diffuse();
+        heart.pumpBlood();
+
     }
 
     /**
@@ -68,21 +69,36 @@ public class Body {
      */
     private class Heart{
 
-        int heartRate; // BeatsPerMinute
+        private int beatsPerMinute = 70; // BeatsPerMinute
+        private int heartRate; // milliseconds
+        private int bloodPumpCounter;
 
-//        Heart(Blood)
-//
-//        public void pumpBlood(){
-//            // Basically controls how fast the simulation runs, each
-//            new Timer(1000, e -> {
-//                if (running) {
-//                    body.manageTurn();
-//                    displayGUI.getReadings();
-//                }
-//            }).start();
-//            blood.circulate();
-//        }
+        Heart() {
+            heartRate = calculateHeartRate();
+            bloodPumpCounter = 0;
+        }
 
+        public void pumpBlood(){
+            // Controls speed of heart pumping
+            bloodPumpCounter++;
+            if (bloodPumpCounter >= calculateHeartRate()) {
+                bloodPumpCounter -= calculateHeartRate();
+                blood.circulate();
+            }
+
+        }
+
+        private int calculateHeartRate(){
+            return (600 / beatsPerMinute);
+        }
+
+        public int getHeartRate() {
+            return heartRate;
+        }
+
+        public void setHeartRate(int heartRate) {
+            this.heartRate = heartRate;
+        }
     }
 
     /**
