@@ -4,7 +4,15 @@ import javax.swing.*;
 
 public class displayGUI extends JFrame{
     private JPanel displayPanel;
-    private JPanel resultsPanel;
+    private JTextArea bloodUnitTextArea;
+    private JLabel arterialO2Label;
+    private JLabel arterialCO2Label;
+    private JLabel venousO2Label;
+    private JLabel venousCO2Label;
+    private JLabel o2ConsumptionLabel;
+    private JLabel co2ConsumptionLabel;
+    private JLabel totalO2BurnedLabel;
+    private JLabel TotalCO2Produced;
     private JLabel PvO2Label;
     private JLabel PaO2Label;
     private JLabel PvCO2Label;

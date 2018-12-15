@@ -24,6 +24,8 @@ public class Blood {
 
     private double strokeVolume;
 
+    private String bloodUnitString;
+
 
     /**
      * This constructor initializes all the blood units, splits the Blood Units into each bloo environment, and sets
@@ -239,6 +241,21 @@ public class Blood {
                         System.out.printf("o2 difference:         %.2f\n", o2Difference);
                         System.out.printf("co2 difference:        %.2f\n", co2Difference);
                         System.out.println("--------------------------------");
+                        bloodUnitString = "";
+                        bloodUnitString += String.format("--------------------------------");
+                        bloodUnitString += String.format("Environment:           %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
+                        bloodUnitString += String.format("Environment total co2: %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneCO2);
+                        bloodUnitString += String.format("Environment total o2:  %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneO2);
+                        bloodUnitString += String.format("Environment co2 perBU: %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneCO2perBU);
+                        bloodUnitString += String.format("Environment o2 perBU:  %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneO2perBU);
+                        bloodUnitString += String.format("BloodUnit ID:          %s\n", bloodUnit.bloodID);
+                        bloodUnitString += String.format("BloodUnit o2:          %.2f\n", bloodUnit.getPo2());
+                        bloodUnitString += String.format("BloodUnit co2:         %.2f\n", bloodUnit.getPco2());
+                        bloodUnitString += String.format("Times diffused:        %d\n", bloodUnit.getTimesDiffused());
+                        bloodUnitString += String.format("o2 difference:         %.2f\n", o2Difference);
+                        bloodUnitString += String.format("co2 difference:        %.2f\n", co2Difference);
+                        bloodUnitString += String.format("--------------------------------");
+
                     }
 
                     // Only print on normal diffusion calls
