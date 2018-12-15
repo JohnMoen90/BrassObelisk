@@ -20,12 +20,7 @@ public class Blood {
     private BloodEnvironment venousBlood;
     private BloodEnvironment bloodInHeart;
 
-    // Diffusion rates  TODO: Move these to BodyConfig
-    private double co2DiffusionRate = .2;
-    private double o2DiffusionRate = .08;
-
     private static int bloodIDCounter;  // Each bloodUnit has an ID number for easy access
-    private static int diffusionCounter;
 
     private double strokeVolume;
 
@@ -39,7 +34,6 @@ public class Blood {
     Blood(double bodyWeight, double strokeVolume){
 
         this.strokeVolume = strokeVolume;
-        diffusionCounter = 0;
         bloodIDCounter = 1;
 
         Queue<BloodUnit> bloodUnits = new LinkedList<>();   // A list for all bloodUnits before transfer into Temp Queue
@@ -128,9 +122,10 @@ public class Blood {
         // Set initial bloodEnvironment values
         setBloodEnvironmentPressures(bloodInHeart, false, 0.0, 0.0);
         setBloodEnvironmentPressures(arterialBlood, false, 0.0, 0.0);
-        setBloodEnvironmentPressures(diffusionZones, true,BodyConfig.diffZoneO2, BodyConfig.diffZoneCo2);
+        setBloodEnvironmentPressures(diffusionZones, true,BodyConfig.diffusionZone02perBU * diffusionZones.bloodQueue.size(),
+                BodyConfig.diffusionZoneC02perBU * diffusionZones.bloodQueue.size());
         setBloodEnvironmentPressures(venousBlood, false, 0.0, 0.0);
-        setBloodEnvironmentPressures(pulmonaryBlood, true, BodyConfig.lungO2, BodyConfig.lungCo2);
+        setBloodEnvironmentPressures(pulmonaryBlood, true, BodyConfig.alveolarZoneO2, 0);
 
         // Save environments into list
         allBloodEnvs.add(bloodInHeart);
@@ -138,6 +133,10 @@ public class Blood {
         allBloodEnvs.add(diffusionZones);
         allBloodEnvs.add(venousBlood);
         allBloodEnvs.add(pulmonaryBlood);
+
+        // Set diffusionZone gas values
+        System.out.println("DiffZone O2: " + diffusionZones.diffusionZoneO2);
+        System.out.println("DiffZone CO2: " +diffusionZones.diffusionZoneCO2);
 
         // Set bloodEnvironment size limits and initial co2/02 values
         for (BloodEnvironment bloodEnvironment: allBloodEnvs) {
@@ -158,9 +157,9 @@ public class Blood {
         //
         for (BloodEnvironment bloodEnv : allBloodEnvs) {
             if (bloodEnv.getBloodEnvID() == bloodEnvID) {
-                if (reading.equals("po2")) {
+                if (reading.equals("diffusionZoneO2")) {
                     return bloodEnv.bloodQueue.peek().po2;
-                } else if (reading.equals("pco2")) {
+                } else if (reading.equals("diffusionZOneCO2")) {
                     return bloodEnv.bloodQueue.peek().pco2;
                 }
             }
@@ -187,7 +186,9 @@ public class Blood {
      * This method equalizes gas pressures between every blood unit and their environment
      */
     public void diffuse(){
-        diffusionCounter++;
+
+        // Temporary metabolism processing here TODO move this elsewhere
+        diffusionZones.metabolize();
 
         // Loop through every blood unit
         for (BloodEnvironment bloodEnvironment: allBloodEnvs) {
@@ -198,36 +199,45 @@ public class Blood {
                     bloodUnit.timesDiffused++;
 
                     // Calculate the difference between pressure values
-                    double co2Difference = Math.abs(bloodUnit.getPco2() - bloodEnvironment.pco2);
-                    double o2Difference = Math.abs(bloodUnit.getPo2() - bloodEnvironment.po2);
+                    double co2Difference = Math.abs(bloodUnit.getPco2() - bloodEnvironment.diffusionZoneCO2perBU);
+                    double o2Difference = Math.abs(bloodUnit.getPo2() - bloodEnvironment.diffusionZoneO2perBU);
 
                     // Equalize CO2
-                    if (bloodUnit.getPco2() > bloodEnvironment.pco2) {
-                        bloodUnit.setPco2((bloodUnit.getPco2() - .1 - (co2Difference * co2DiffusionRate)));
-                    } else if (bloodUnit.getPco2() < bloodEnvironment.pco2) {
-                        bloodUnit.setPco2((bloodUnit.getPco2() + .1 + (co2Difference * co2DiffusionRate)));
+                    if (bloodUnit.getPco2() > bloodEnvironment.diffusionZoneCO2perBU) {
+                        bloodEnvironment.setDiffusionZoneCO2(bloodEnvironment.getDiffusionZoneCO2() + .5);
+                        bloodUnit.setPco2(bloodUnit.getPco2() - .5);
+                    } else if (bloodUnit.getPco2() < bloodEnvironment.diffusionZoneCO2perBU) {
+                        bloodUnit.setPco2(bloodUnit.getPco2() + .5);
+                        bloodEnvironment.setDiffusionZoneCO2(bloodEnvironment.getDiffusionZoneCO2() - .5);
                     }
 
+
                     // Equalize O2
-                    if (bloodUnit.getPo2() > bloodEnvironment.po2) {
-                        bloodUnit.setPo2((bloodUnit.getPo2() - .01 - (o2Difference * o2DiffusionRate)));
-                    } else if (bloodUnit.getPo2() < bloodEnvironment.po2) {
-                        bloodUnit.setPo2((bloodUnit.getPo2() + .01 + (o2Difference * co2DiffusionRate)));
+                    if (bloodUnit.getPo2() > bloodEnvironment.diffusionZoneO2perBU) {
+                        bloodEnvironment.setDiffusionZoneO2(bloodEnvironment.getDiffusionZoneO2() + .5);
+                        bloodUnit.setPo2(bloodUnit.getPo2() - .5);
+                    } else if (bloodUnit.getPo2() < bloodEnvironment.diffusionZoneO2perBU) {
+                        bloodUnit.setPo2(bloodUnit.getPo2() + .5);
+                        bloodEnvironment.setDiffusionZoneO2(bloodEnvironment.getDiffusionZoneO2() - .5);
                     }
+
+
+
 
                     // Prints bloodUnit stats for the same bloodUnit each second for testing reasons
                     if (bloodUnit.bloodID == 10) {
-                        diffusionCounter -= 1000;
                         System.out.println("--------------------------------");
-                        System.out.printf("Environment:         %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
-                        System.out.printf("Environment co2:     %s\n", bloodUnit.getCurrentEnvironment().pco2);
-                        System.out.printf("Environment o2:      %s\n", bloodUnit.getCurrentEnvironment().po2);
-                        System.out.printf("BloodUnit ID:        %s\n", bloodUnit.bloodID);
-                        System.out.printf("BloodUnit o2:        %.2f\n", bloodUnit.getPo2());
-                        System.out.printf("BloodUnit co2:       %.2f\n", bloodUnit.getPco2());
-                        System.out.printf("Times diffused:      %d\n", bloodUnit.getTimesDiffused());
-                        System.out.printf("o2 difference:       %.2f\n", o2Difference);
-                        System.out.printf("co2 difference:      %.2f\n", co2Difference);
+                        System.out.printf("Environment:           %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
+                        System.out.printf("Environment total co2: %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneCO2);
+                        System.out.printf("Environment total o2:  %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneO2);
+                        System.out.printf("Environment co2 perBU: %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneCO2perBU);
+                        System.out.printf("Environment o2 perBU:  %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneO2perBU);
+                        System.out.printf("BloodUnit ID:          %s\n", bloodUnit.bloodID);
+                        System.out.printf("BloodUnit o2:          %.2f\n", bloodUnit.getPo2());
+                        System.out.printf("BloodUnit co2:         %.2f\n", bloodUnit.getPco2());
+                        System.out.printf("Times diffused:        %d\n", bloodUnit.getTimesDiffused());
+                        System.out.printf("o2 difference:         %.2f\n", o2Difference);
+                        System.out.printf("co2 difference:        %.2f\n", co2Difference);
                         System.out.println("--------------------------------");
                     }
 
@@ -236,7 +246,6 @@ public class Blood {
 
                 } else {
                     if (bloodUnit.bloodID == 10) {
-                        diffusionCounter -= 1000;
                         System.out.println("--------------------------------");
                         System.out.printf("Environment:         %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
                         System.out.printf("BloodUnit ID:        %s\n", bloodUnit.bloodID);
@@ -261,10 +270,10 @@ public class Blood {
         bloodEnvironment.setDiffusionZone(diffusionZone);
         if (diffusionZone) {
             if (po2Value != 0) {
-                bloodEnvironment.setPo2(po2Value);
+                bloodEnvironment.setDiffusionZoneO2(po2Value);
             }
             if (pco2Value != 0) {
-                bloodEnvironment.setPco2(pco2Value);
+                bloodEnvironment.setDiffusionZoneCO2(pco2Value);
             }
         }
     }
@@ -286,8 +295,10 @@ public class Blood {
         private String name;    // Helpful to access specific bloodEnvironment sometimes
         private int bloodEnvID; // Another way to access specific bloodEnvironments; heart - 0, lungs - 1, body - 2
         private boolean diffusionZone;
-        private double po2;
-        private double pco2;
+        private double diffusionZoneO2;
+        private double diffusionZoneO2perBU;
+        private double diffusionZoneCO2;
+        private double diffusionZoneCO2perBU;
 
 
         BloodEnvironment(String name, int bloodEnvID, Queue<BloodUnit> bloodQueue){
@@ -297,6 +308,8 @@ public class Blood {
             this.bloodQueue = new LinkedList<>();   //<-- This technique allows the tempQueue in
             this.bloodQueue.addAll(bloodQueue);     //    initializeBloodEnvironment() to be reused
         }
+
+
 
 
         /**
@@ -323,20 +336,22 @@ public class Blood {
             return this.name;
         }
 
-        public double getPo2() {
-            return po2;
+        public double getDiffusionZoneO2() {
+            return diffusionZoneO2;
         }
 
-        public void setPo2(double po2) {
-            this.po2 = po2;
+        public void setDiffusionZoneO2(double diffusionZoneO2) {
+            this.diffusionZoneO2 = diffusionZoneO2;
+            diffusionZoneO2perBU = getDiffusionZoneO2() / bloodQueue.size();
         }
 
-        public double getPco2() {
-            return pco2;
+        public double getDiffusionZoneCO2() {
+            return diffusionZoneCO2;
         }
 
-        public void setPco2(double pco2) {
-            this.pco2 = pco2;
+        public void setDiffusionZoneCO2(double diffusionZoneCO2) {
+            this.diffusionZoneCO2 = diffusionZoneCO2;
+            diffusionZoneCO2perBU = getDiffusionZoneCO2() / bloodQueue.size();
         }
 
         public BloodEnvironment getNextEnvironment() {
@@ -370,6 +385,13 @@ public class Blood {
         public void setDiffusionZone(boolean diffusionZone) {
             this.diffusionZone = diffusionZone;
         }
+
+        public void metabolize() {
+            if (this.equals(diffusionZones)) {
+                setDiffusionZoneO2(getDiffusionZoneO2() - 10);
+                setDiffusionZoneCO2(getDiffusionZoneCO2() + (9));
+            }
+        }
     }
 
 
@@ -385,13 +407,14 @@ public class Blood {
         private double pco2;
 
         BloodUnit(){
-            this.po2 = 100; // mmHg
-            this.pco2 = 40; // mmHg
+            this.po2 = 200; // ml/L
+            this.pco2 = 500; // mmHg
             this.bloodID = bloodIDCounter;
             this.timesDiffused =0;
             bloodIDCounter++;
             allBloodUnits.add(this);
         }
+
 
 
         /**
