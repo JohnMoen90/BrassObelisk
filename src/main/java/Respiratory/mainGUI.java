@@ -31,6 +31,7 @@ public class mainGUI extends JFrame {
 
         this.body = new Body();
         this.displayGUI = new displayGUI(body, this);
+
         Counter counter = new Counter();
 
         // Set default values from bodyConfig
@@ -51,8 +52,8 @@ public class mainGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
             if (running) {
+                displayGUI.getReadings();
                 body.manageTurn();
-//                displayGUI.getReadings();
             }
             }
         }).start();

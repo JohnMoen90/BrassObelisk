@@ -6,16 +6,18 @@
       <xy x="20" y="20" width="500" height="400"/>
     </constraints>
     <properties>
+      <font size="16"/>
       <minimumSize width="456" height="358"/>
       <preferredSize width="456" height="358"/>
     </properties>
-    <border type="none"/>
+    <border type="none" title="Respiratory System"/>
     <children>
       <component id="d3d0a" class="javax.swing.JLabel">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="20"/>
           <text value="70kg, Normal Atmosphere, Healthy"/>
         </properties>
       </component>
@@ -24,6 +26,7 @@
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="AcO2 ml/L"/>
         </properties>
       </component>
@@ -32,6 +35,7 @@
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="0.00"/>
         </properties>
       </component>
@@ -40,6 +44,7 @@
           <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="VO2 ml/L/sec"/>
         </properties>
       </component>
@@ -48,6 +53,7 @@
           <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="0.00"/>
         </properties>
       </component>
@@ -56,6 +62,7 @@
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="AcCO2 ml/L"/>
         </properties>
       </component>
@@ -64,6 +71,7 @@
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="0.00"/>
         </properties>
       </component>
@@ -72,6 +80,7 @@
           <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="VCO2 ml/L/sec"/>
         </properties>
       </component>
@@ -80,6 +89,7 @@
           <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="0.00"/>
         </properties>
       </component>
@@ -88,6 +98,7 @@
           <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="VcO2 ml/L"/>
         </properties>
       </component>
@@ -96,6 +107,7 @@
           <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="0.00"/>
         </properties>
       </component>
@@ -104,6 +116,7 @@
           <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="Total VO2 L"/>
         </properties>
       </component>
@@ -112,6 +125,7 @@
           <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="0.00"/>
         </properties>
       </component>
@@ -120,6 +134,7 @@
           <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="VcO2 ml/L"/>
         </properties>
       </component>
@@ -128,6 +143,7 @@
           <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="0.00"/>
         </properties>
       </component>
@@ -136,14 +152,16 @@
           <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="Total VCO2 L"/>
         </properties>
       </component>
-      <component id="39213" class="javax.swing.JLabel" binding="TotalCO2Produced">
+      <component id="39213" class="javax.swing.JLabel" binding="totalCO2ProducedLabel">
         <constraints>
           <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font size="16"/>
           <text value="0.00"/>
         </properties>
       </component>
@@ -153,7 +171,9 @@
             <preferred-size width="150" height="50"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <font size="20"/>
+        </properties>
       </component>
       <component id="4243d" class="javax.swing.JTextArea" default-binding="true">
         <constraints>
@@ -161,7 +181,9 @@
             <preferred-size width="150" height="50"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <font size="20"/>
+        </properties>
       </component>
     </children>
   </grid>

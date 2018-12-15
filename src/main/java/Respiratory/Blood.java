@@ -25,6 +25,9 @@ public class Blood {
     private double strokeVolume;
 
     private String bloodUnitString;
+    private double totalO2Consumed;
+    private double totalCO2Produced;
+
 
 
     /**
@@ -36,6 +39,8 @@ public class Blood {
     Blood(double bodyWeight, double strokeVolume){
 
         this.strokeVolume = strokeVolume;
+        this.totalO2Consumed = 0;
+        this.totalCO2Produced =0;
         bloodIDCounter = 1;
 
         Queue<BloodUnit> bloodUnits = new LinkedList<>();   // A list for all bloodUnits before transfer into Temp Queue
@@ -159,9 +164,9 @@ public class Blood {
         //
         for (BloodEnvironment bloodEnv : allBloodEnvs) {
             if (bloodEnv.getBloodEnvID() == bloodEnvID) {
-                if (reading.equals("diffusionZoneO2")) {
+                if (reading.equals("o2")) {
                     return bloodEnv.bloodQueue.peek().po2;
-                } else if (reading.equals("diffusionZOneCO2")) {
+                } else if (reading.equals("co2")) {
                     return bloodEnv.bloodQueue.peek().pco2;
                 }
             }
@@ -241,20 +246,21 @@ public class Blood {
                         System.out.printf("o2 difference:         %.2f\n", o2Difference);
                         System.out.printf("co2 difference:        %.2f\n", co2Difference);
                         System.out.println("--------------------------------");
-                        bloodUnitString = "";
-                        bloodUnitString += String.format("--------------------------------");
-                        bloodUnitString += String.format("Environment:           %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
-                        bloodUnitString += String.format("Environment total co2: %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneCO2);
-                        bloodUnitString += String.format("Environment total o2:  %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneO2);
-                        bloodUnitString += String.format("Environment co2 perBU: %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneCO2perBU);
-                        bloodUnitString += String.format("Environment o2 perBU:  %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneO2perBU);
-                        bloodUnitString += String.format("BloodUnit ID:          %s\n", bloodUnit.bloodID);
-                        bloodUnitString += String.format("BloodUnit o2:          %.2f\n", bloodUnit.getPo2());
-                        bloodUnitString += String.format("BloodUnit co2:         %.2f\n", bloodUnit.getPco2());
-                        bloodUnitString += String.format("Times diffused:        %d\n", bloodUnit.getTimesDiffused());
-                        bloodUnitString += String.format("o2 difference:         %.2f\n", o2Difference);
-                        bloodUnitString += String.format("co2 difference:        %.2f\n", co2Difference);
-                        bloodUnitString += String.format("--------------------------------");
+                        String tempBloodUnitString = "";
+                        tempBloodUnitString += String.format("--------------------------------");
+                        tempBloodUnitString += String.format("Environment:           %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
+                        tempBloodUnitString += String.format("Environment total co2: %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneCO2);
+                        tempBloodUnitString += String.format("Environment total o2:  %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneO2);
+                        tempBloodUnitString += String.format("Environment co2 perBU: %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneCO2perBU);
+                        tempBloodUnitString += String.format("Environment o2 perBU:  %.2f\n", bloodUnit.getCurrentEnvironment().diffusionZoneO2perBU);
+                        tempBloodUnitString += String.format("BloodUnit ID:          %s\n", bloodUnit.bloodID);
+                        tempBloodUnitString += String.format("BloodUnit o2:          %.2f\n", bloodUnit.getPo2());
+                        tempBloodUnitString += String.format("BloodUnit co2:         %.2f\n", bloodUnit.getPco2());
+                        tempBloodUnitString += String.format("Times diffused:        %d\n", bloodUnit.getTimesDiffused());
+                        tempBloodUnitString += String.format("o2 difference:         %.2f\n", o2Difference);
+                        tempBloodUnitString += String.format("co2 difference:        %.2f\n", co2Difference);
+                        tempBloodUnitString += String.format("--------------------------------");
+                        setBloodUnitString(tempBloodUnitString);
 
                     }
 
@@ -293,6 +299,30 @@ public class Blood {
                 bloodEnvironment.setDiffusionZoneCO2(pco2Value);
             }
         }
+    }
+
+    public String getBloodUnitString() {
+        return bloodUnitString;
+    }
+
+    public void setBloodUnitString(String bloodUnitString) {
+        this.bloodUnitString = bloodUnitString;
+    }
+
+    public double getTotalO2Consumed() {
+        return totalO2Consumed;
+    }
+
+    public void setTotalO2Consumed(double totalO2Consumed) {
+        this.totalO2Consumed = totalO2Consumed;
+    }
+
+    public double getTotalCO2Produced() {
+        return totalCO2Produced;
+    }
+
+    public void setTotalCO2Produced(double totalCO2Produced) {
+        this.totalCO2Produced = totalCO2Produced;
     }
 
 
@@ -406,7 +436,9 @@ public class Blood {
         public void metabolize() {
             if (this.equals(diffusionZones)) {
                 setDiffusionZoneO2(getDiffusionZoneO2() - 10);
+                totalO2Consumed += 10;
                 setDiffusionZoneCO2(getDiffusionZoneCO2() + (9));
+                totalCO2Produced += 9;
             }
         }
     }

@@ -1,6 +1,8 @@
 package Respiratory;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
 
 public class displayGUI extends JFrame{
     private JPanel displayPanel;
@@ -12,11 +14,9 @@ public class displayGUI extends JFrame{
     private JLabel o2ConsumptionLabel;
     private JLabel co2ConsumptionLabel;
     private JLabel totalO2BurnedLabel;
-    private JLabel TotalCO2Produced;
-    private JLabel PvO2Label;
-    private JLabel PaO2Label;
-    private JLabel PvCO2Label;
-    private JLabel PaCO2Label;
+    private JLabel totalCO2ProducedLabel;
+    private ArrayList<JLabel> allLabels;
+
 
     // Variables for body and mainGUI
     private Body body;
@@ -28,18 +28,39 @@ public class displayGUI extends JFrame{
     private double PaO2Value;
     private double PaCO2Value;
 
+    private int getReadingsCounter;
+
 
     displayGUI(Body body, mainGUI mainGUI){
 
         this.body = body;
         this.mainGUI = mainGUI;
 
+        getReadingsCounter = 0;
+
         setContentPane(displayPanel);
+
+
+
         pack();
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        allLabels.add(arterialO2Label);
+//        allLabels.add(arterialCO2Label);
+//        allLabels.add(venousO2Label);
+//        allLabels.add(venousCO2Label);
+//        allLabels.add(o2ConsumptionLabel);
+//        allLabels.add(co2ConsumptionLabel);
+//        allLabels.add(totalO2BurnedLabel);
+//        allLabels.add(totalCO2ProducedLabel);
+//
+//        Font testFont = new java.awt.Font(Font.SANS_SERIF, Font.PLAIN, 32);
+//
+//        for (JLabel label: allLabels) {
+//            label.setFont(testFont);
+//        }
 
-//        getReadings();
+        getReadings();
 
 
 
@@ -48,17 +69,18 @@ public class displayGUI extends JFrame{
 
 
     public void getReadings(){
+        getReadingsCounter++;
+        if (getReadingsCounter == 5) {
+            getReadingsCounter -= 5;
+            arterialO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(1, "o2")));
+            arterialCO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(1, "co2")));
+            venousO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(3, "o2")));
+            venousCO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(3, "co2")));
 
+            bloodUnitTextArea.setText(body.bloodReadings().getBloodUnitString());
 
-        PvO2Value = body.bloodReadings().getReading(2,"po2");
-        PvCO2Value = body.bloodReadings().getReading(2,"pco2");
-
-        PvO2Value = body.bloodReadings().getReading(0,"po2");
-        PvCO2Value = body.bloodReadings().getReading(0,"pco2");
-
-        PvCO2Label.setText(String.format("%f",PvCO2Value));
-        PvO2Label.setText(String.format("%f",PvO2Value));
-        PaCO2Label.setText(String.format("%f",PaCO2Value));
-        PaO2Label.setText(String.format("%f",PaO2Value));
+            totalO2BurnedLabel.setText(String.format("%.2f", body.bloodReadings().getTotalO2Consumed()));
+            totalCO2ProducedLabel.setText(String.format("%.2f", body.bloodReadings().getTotalO2Consumed()));
+        }
     }
 }
