@@ -15,6 +15,9 @@ public class displayGUI extends JFrame{
     private JLabel co2ConsumptionLabel;
     private JLabel totalO2BurnedLabel;
     private JLabel totalCO2ProducedLabel;
+    private JLabel breathStatusLabel;
+    private JLabel o2InLungsLabel;
+    private JLabel co2InLungsLabel;
     private ArrayList<JLabel> allLabels;
 
 
@@ -81,6 +84,10 @@ public class displayGUI extends JFrame{
 
             totalO2BurnedLabel.setText(String.format("%.2f", body.bloodReadings().getTotalO2Consumed()));
             totalCO2ProducedLabel.setText(String.format("%.2f", body.bloodReadings().getTotalO2Consumed()));
+
+            breathStatusLabel.setText(body.getBreathStatus());
+            co2InLungsLabel.setText(String.format("%.2f", body.lungReadings().getGasReadings("co2")));
+            co2InLungsLabel.setText(String.format("%.2f", body.lungReadings().getGasReadings("o2")));
         }
     }
 }

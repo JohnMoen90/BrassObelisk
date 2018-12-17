@@ -8,15 +8,14 @@ public class Body {
 
     // Initialize some variables
     private double bodyWeight = BodyConfig.bodyWeight;
-    private double Vo2 = (17 * bodyWeight) / 60; // ml perSecond
-    private double Vco2 = (1.1 * bodyWeight) / 60; // ml perSecond
+//    private double Vo2 = (17 * bodyWeight) / 60; // ml perSecond
+//    private double Vco2 = (1.1 * bodyWeight) / 60; // ml perSecond
 
     // "Body objects" - blood, lungs, cns, and heart
     private static Blood blood;
     private Lungs lungs;
     private Heart heart;
     private CNS cns;
-
 
     // Constructor
     Body(){
@@ -31,7 +30,7 @@ public class Body {
      * This function handles each of the components state changes over time, it is activated by
      */
     public void manageTurn(){
-
+        lungs.breathe();
         blood.diffuse();
         heart.pumpBlood();
 
@@ -49,18 +48,113 @@ public class Body {
     public CNS cnsReadings()     { return cns;   }
 
 
+    public String getBreathStatus(){
+        return lungs.getBreathState();
+    }
+
     /**
      * This class handles not only the lungs but the entire respiratory system basically
      */
-    private class Lungs{
+    public class Lungs{
 
         private double totalLungCapacity = BodyConfig.totalLungCapacity;
-        private double conductingZone = totalLungCapacity * .8;
-        private double respiratoryZone = totalLungCapacity * .2;    // <-- This is where gas exchange happens
+        private double conductingZoneMax = totalLungCapacity * .8;
+        private double respiratoryZoneSize = totalLungCapacity * .2;    // <-- This is where gas exchange happens
+        private double currentConductingZoneVolume;
+
+        private double conductionZoneO2;
+        private double conductionZoneCO2;
+        private double respiratoryZoneO2;
+        private double respiratoryZoneCO2;
+
+        private boolean breathHeld;
+        private boolean inhale;
+        private boolean exhale;
+
+        private double respiratoryRate;
+        private double respiratoryDepth;    //Percentage of conductionZone
+        private double breathLength;
+        private double breathCounter;
 
 
         public Lungs() {
+            this.inhale = true;
+            this.exhale = false;
+            this.breathHeld = false;
+            currentConductingZoneVolume = conductingZoneMax *.2;
+            respiratoryRate = 12;
+            respiratoryDepth = conductingZoneMax * .25;
+            respiratoryZoneO2 = respiratoryZoneSize * .2;
+            respiratoryZoneCO2 = respiratoryZoneSize * .1;
 
+        }
+
+        public void breathe(){
+
+
+            // If the breath is not held
+            if (!breathHeld) {
+
+                // Set breath size and counter
+                breathLength = (600 / respiratoryRate) * .5; // <-- converting from min to 10ths of a second
+                breathCounter++;
+
+                // If
+                if (breathCounter >= breathLength) {
+                    breathCounter -= breathLength;
+                    if (inhale) {
+                        exhale = true;
+                        inhale = false;
+                    } else {
+                        inhale = true;
+                        exhale = true;
+                    }
+                } else {
+                    if (inhale) {
+                        expandLungs(respiratoryDepth/breathLength);
+                    } else {
+                        contractLungs(respiratoryDepth/breathLength);
+                    }
+
+
+                }
+            }
+
+
+
+            blood.setBloodEnvironmentPressures("pulmonary", respiratoryZoneO2, respiratoryZoneCO2);
+
+        }
+
+        public void expandLungs(double totalTickLungExpansion){
+            conductionZoneO2 += totalTickLungExpansion * .2;
+            currentConductingZoneVolume += totalTickLungExpansion;
+        }
+
+        public void contractLungs(double totalTickLungContraction){
+            if(conductionZoneO2 > 0) {
+                conductionZoneO2 -= totalTickLungContraction * .5;
+            }
+            if (conductionZoneCO2 > 0) {
+                conductionZoneO2 -= totalTickLungContraction * .5;
+
+            }
+        }
+
+        public String getBreathState(){
+            if (breathHeld) {
+                return "Breath held";
+            } else {
+                return inhale ? "Inhale" : "Exhale";
+            }
+        }
+
+        public double getGasReadings(String gas) {
+            if (gas.equals("o2")) {
+                return conductionZoneO2 + respiratoryZoneO2;
+            } else {
+                return conductionZoneCO2 + respiratoryZoneCO2;
+            }
         }
     }
 

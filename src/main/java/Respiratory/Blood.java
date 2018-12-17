@@ -300,6 +300,21 @@ public class Blood {
             }
         }
     }
+    public void setBloodEnvironmentPressures(String bloodEnvironmentString, double po2Value, double pco2Value){
+
+        for (BloodEnvironment bloodEnvironment: allBloodEnvs) {
+            if (bloodEnvironment.name.equals(bloodEnvironmentString)) {
+                if (po2Value != 0) {
+                    bloodEnvironment.setDiffusionZoneO2(po2Value);
+                }
+                if (pco2Value != 0) {
+                    bloodEnvironment.setDiffusionZoneCO2(pco2Value);
+                }
+            }
+        }
+
+
+    }
 
     public String getBloodUnitString() {
         return bloodUnitString;
