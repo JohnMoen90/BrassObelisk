@@ -1,6 +1,17 @@
 package Respiratory;
 
+
 public class BodyConfig {
+
+
+    // lets try again
+    static double initVO2;
+    static double initVCO2;
+    static double initLungO2;
+    static double initLungCO2;
+
+
+
 
     // Basic starting values for simulation, templates will be loaded here
     static double bodyWeight = 70.0; // kg

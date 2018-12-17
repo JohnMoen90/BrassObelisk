@@ -17,12 +17,18 @@ public class Body {
     private Heart heart;
     private CNS cns;
 
+    private int changeAssignersCounter;
+
+    private double vo2;
+
     // Constructor
     Body(){
+        changeAssignersCounter = 0;
+        vo2 = 40;
         blood = new Blood(bodyWeight, BodyConfig.strokeVolume);
-        this.lungs = new Lungs();
-        this.heart = new Heart();
-        this.cns = new CNS();
+        this.lungs = new Lungs(blood);
+        this.heart = new Heart(blood);
+        this.cns = new CNS(heart, lungs);
     }
 
 
@@ -30,6 +36,7 @@ public class Body {
      * This function handles each of the components state changes over time, it is activated by
      */
     public void manageTurn(){
+        calculateGasAssignment();
         lungs.breathe();
         blood.diffuse();
         heart.pumpBlood();
@@ -52,10 +59,32 @@ public class Body {
         return lungs.getBreathState();
     }
 
+    public void calculateGasAssignment(){
+        changeAssignersCounter++;
+        if (changeAssignersCounter == 10) {
+            setMetabolicRate();
+            cns.resolveImbalance();
+        }
+
+    }
+
+    public void setMetabolicRate(){
+
+        blood.setMetabolicRate(-(vo2 /((double)heart.calculateBeatsPerSecond()/1.2)),
+                vo2 /(calculateVco2()));
+    }
+
+    public double calculateVco2(){
+        return (vo2/((double)heart.calculateBeatsPerSecond()/1.2)) * .125;
+    }
+
+
     /**
      * This class handles not only the lungs but the entire respiratory system basically
      */
     public class Lungs{
+
+        private Blood blood;
 
         private double totalLungCapacity = BodyConfig.totalLungCapacity;
         private double conductingZoneMax = totalLungCapacity * .8;
@@ -77,15 +106,19 @@ public class Body {
         private double breathCounter;
 
 
-        public Lungs() {
+        public Lungs(Blood blood) {
+            this.blood = blood;
             this.inhale = true;
             this.exhale = false;
             this.breathHeld = false;
             currentConductingZoneVolume = conductingZoneMax *.2;
             respiratoryRate = 12;
+//            maxRespiratoryRate =60;
             respiratoryDepth = conductingZoneMax * .25;
             respiratoryZoneO2 = respiratoryZoneSize * .2;
             respiratoryZoneCO2 = respiratoryZoneSize * .1;
+
+//            respiratoryRateValue;
 
         }
 
@@ -121,9 +154,6 @@ public class Body {
             }
 
 
-
-            blood.setBloodEnvironmentPressures("pulmonary", respiratoryZoneO2, respiratoryZoneCO2);
-
         }
 
         public void expandLungs(double totalTickLungExpansion){
@@ -156,6 +186,27 @@ public class Body {
                 return conductionZoneCO2 + respiratoryZoneCO2;
             }
         }
+
+        public void increaseRespiratoryDepthValue(){
+
+        }
+
+
+        public void setRespiratoryRate(double respiratoryRate) {
+            this.respiratoryRate = respiratoryRate;
+        }
+
+        public double getRespiratoryRate() {
+            return respiratoryRate;
+        }
+
+        public double getRespiratoryDepth() {
+            return respiratoryDepth;
+        }
+
+        public void setRespiratoryDepth(double respiratoryDepth) {
+            this.respiratoryDepth = respiratoryDepth;
+        }
     }
 
     /**
@@ -167,7 +218,10 @@ public class Body {
         private int heartRate; // milliseconds
         private int bloodPumpCounter;
 
-        Heart() {
+        Blood blood;
+
+        Heart(Blood blood) {
+            this.blood = blood;
             heartRate = calculateHeartRate();
             bloodPumpCounter = 0;
         }
@@ -184,11 +238,13 @@ public class Body {
 
         /**
          * Converts the BPM to to appropriate counter value, which is .1 seconds each tick.
+         * This x10 is the BPSecond
          * @return
          */
         private int calculateHeartRate(){   // <-- Float is fine here since the evaluation is >=
             return (600 / beatsPerMinute);
         }
+        private int calculateBeatsPerSecond(){return (beatsPerMinute / 60);}
 
         public int getHeartRate() {
             return heartRate;
@@ -203,6 +259,50 @@ public class Body {
      * This class handles negative feedback loops and links lung/heart behavior with nutrient/waste levels in blood
      */
     private class CNS{
+
+        Heart heart;
+        Lungs lungs;
+
+        double arterialO2;
+        double arterialCO2;
+
+        int resolutionCounter;
+
+        CNS(Heart heart, Lungs lungs){
+            this.heart = heart;
+            this.lungs = lungs;
+        }
+
+        public void getHeartReadings(){
+            arterialO2 = blood.getReading(0,"O2");
+            arterialCO2 = blood.getReading(0,"CO2");
+        }
+
+        public void resolveImbalance(){
+            getHeartReadings();
+
+            if (resolutionCounter > 0) {
+                resolutionCounter--;
+            }
+
+            if (arterialO2 < 100) {
+                resolutionCounter += 10;
+                increaseBreathDepth();
+                return;
+            }
+        }
+
+        public void increaseBPM(){
+
+        }
+
+        public void increaseBreathRate(){
+
+        }
+
+        public void increaseBreathDepth(){
+            lungs.increaseRespiratoryDepthValue();
+        }
 
     }
 }
