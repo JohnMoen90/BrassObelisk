@@ -2,7 +2,7 @@ public class BodyConfig {
 
 
     // Main variables
-    static double bodyWeight = 70.0; // kg
+    static double bodyWeight; // kg
     static int age;
     static int fitnessLevel;
     static String exerciseXP;
@@ -27,6 +27,9 @@ public class BodyConfig {
     static final int DIFFZONE_ENV_ID = 2;
     static final int VEIN_ENV_ID = 3;
     static final int LUNG_ENV_ID = 4;
+
+
+
 
     static double secO2Consumption = .4167; // ml/sec
     static double tickO2Consumption = secO2Consumption * 10; // ml/sec
@@ -54,4 +57,12 @@ public class BodyConfig {
     static double bloodUnitMax02Saturation = 203; //ml/L
 
 
+    public static void setStartValues(Profile selectedProfile) {
+        // Main variables
+        bodyWeight = selectedProfile.getWeight(); // kg
+        age = selectedProfile.getAge();
+        fitnessLevel = selectedProfile.getFitnessLevel();
+
+
+    }
 }

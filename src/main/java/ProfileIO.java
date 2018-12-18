@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class ProfileIO {
 
-    static final String DB_URL = "jdbc:sqlite:databases/profiles.sqlite";
+    static final String DB_URL = "jdbc:sqlite:databases/profiles";
 
 
     static public ArrayList<Profile> getAllProfiles() {
@@ -21,7 +21,7 @@ public class ProfileIO {
                         resultSet.getString("profile_name"),
                         resultSet.getInt("age"),
                         resultSet.getInt("weight"),
-                        resultSet.getInt("fitness_lvl"),
+                        resultSet.getInt("fitness_level"),
                         resultSet.getBoolean("smoker")));
             }
 
@@ -35,7 +35,7 @@ public class ProfileIO {
 
     }
 
-    public boolean addNewProfile(Profile profile) {
+    static public boolean addNewProfile(Profile profile) {
 
         final String addProfileSql = "INSERT INTO user_profiles VALUES (?, ?, ?, ?, ?)";
 

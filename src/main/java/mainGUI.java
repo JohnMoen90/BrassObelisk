@@ -24,6 +24,8 @@ public class mainGUI extends JFrame {
     private boolean running;
 
     private ArrayList<Profile> profiles;
+    private Profile selectedProfile;
+    private Profile defaultProfile;
 
     private displayGUI displayGUI;
     private Body body;
@@ -36,9 +38,20 @@ public class mainGUI extends JFrame {
 
     mainGUI() {
 
-        this.body = new Body();
+        if (ProfileIO.getAllProfiles() == null || ProfileIO.getAllProfiles().isEmpty()) {
+            defaultProfile = new Profile("default", 25, 70, 1, false);
+            ProfileIO.addNewProfile(defaultProfile);
+        }
+        setProfileComboBox();
+
+        for (Profile profile: profiles) {
+            if (profile.getProfileName().equals("default")) {
+                BodyConfig.setStartValues(profile);
+            }
+        }
+
+        body = new Body();
         this.displayGUI = new displayGUI(body, this);
-        profiles = ProfileIO.getAllProfiles();
 
         // Set default values from bodyConfig
         beatsperMinute = 70;
@@ -59,15 +72,16 @@ public class mainGUI extends JFrame {
         new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            if (running) {
-                displayGUI.getReadings();
-                body.manageTurn();
-            }
+                if (running) {
+                    displayGUI.getReadings();
+                    body.manageTurn();
+                }
             }
         }).start();
 
         // Event Listeners
         StartButton.addActionListener(e -> {
+
             if (!running) {
                 StartButton.setText("Stop");
                 running = true;
@@ -78,13 +92,13 @@ public class mainGUI extends JFrame {
 
         });
 
-        smokerCheckBox.addChangeListener(e -> {
-            if (!smokerCheckBox.isSelected()) {
-                body.setSmoker(true);
-            } else {
-                body.setSmoker(false);
-            }
-        });
+//        smokerCheckBox.addChangeListener(e -> {
+//            if (!smokerCheckBox.isSelected()) {
+//                body.setSmoker(true);
+//            } else {
+//                body.setSmoker(false);
+//            }
+//        });
 
         phyTrainingComboBox.addActionListener(e -> {
             BodyConfig.exerciseXP = (String) phyTrainingComboBox.getSelectedItem();
@@ -99,11 +113,13 @@ public class mainGUI extends JFrame {
             setProfileComboBox();
             for (Profile profile: profiles) {
                 if (profile.getProfileName().equals(profilesComboBox.getSelectedItem())) {
+                    selectedProfile = profile;
                     profileNameTextField.setText(profile.getProfileName());
                     ageTextField.setText(String.format("%d",profile.getAge()));
                     bodyWeightTextField.setText(String.format("%d",profile.getWeight()));
                     phyTrainingComboBox.setSelectedIndex(profile.getFitnessLevel());
                     smokerCheckBox.setSelected(profile.isSmoker());
+//                    generateBody(profile);
                 }
             }
 
@@ -111,9 +127,17 @@ public class mainGUI extends JFrame {
 
     }
 
+//    public Body generateBody(Profile profile){
+//        BodyConfig.setStartValues(profile);
+//        return new Body();
+//    }
+
     private void setProfileComboBox() {
-        for (Profile profile: profiles) {
+        profilesComboBox.removeAllItems();
+        profiles = new ArrayList<>();
+        for (Profile profile: ProfileIO.getAllProfiles()) {
             profilesComboBox.addItem(profile.getProfileName());
+            profiles.add(profile);
         }
     }
 
