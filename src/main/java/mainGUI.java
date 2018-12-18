@@ -107,6 +107,7 @@ public class mainGUI extends JFrame {
 
         saveNewProfileButton.addActionListener(e -> {
             addNewProfile();
+            setProfileComboBox();
         });
 
         profilesComboBox.addActionListener(e -> {
@@ -146,16 +147,20 @@ public class mainGUI extends JFrame {
 
         if (profileNameTextField.getText().equals("") || ageTextField.getText().equals(""))
             JOptionPane.showMessageDialog(rootPane, "Please fill all fields before saving.");
+
         else {
             try {
                 int age = Integer.parseInt(ageTextField.getText());
                 int weight = Integer.parseInt(ageTextField.getText());
-                profiles.add(new Profile(
+                boolean unique = ProfileIO.addNewProfile(new Profile(
                         profileNameTextField.getText(),
                         age,
                         weight,
                         phyTrainingComboBox.getSelectedIndex(),
                         smokerCheckBox.isSelected()));
+                if (!unique) {
+                    JOptionPane.showMessageDialog(rootPane, "That profile already exists, please choose another name");
+                }
             } catch (NumberFormatException nfe) {
                 JOptionPane.showMessageDialog(rootPane, "Please use numeric characters in age and weight fields.");
             }
