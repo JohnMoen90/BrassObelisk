@@ -1,3 +1,6 @@
+/**
+ * Simple profile class to store information from database
+ */
 public class Profile {
 
     private String profileName;
@@ -20,40 +23,22 @@ public class Profile {
         return profileName;
     }
 
-    public void setProfileName(String profileName) {
-        this.profileName = profileName;
-    }
-
 
     public int getAge() {
         return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 
     public int getWeight() {
         return weight;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
     public int getFitnessLevel() {
         return fitnessLevel;
     }
 
-    public void setFitnessLevel(int fitnessLevel) {
-        this.fitnessLevel = fitnessLevel;
-    }
 
     public boolean isSmoker() {
         return smoker;
     }
 
-    public void setSmoker(boolean smoker) {
-        this.smoker = smoker;
-    }
 }

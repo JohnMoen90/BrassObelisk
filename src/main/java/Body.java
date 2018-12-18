@@ -77,10 +77,12 @@ public class Body {
 
     }
 
+    /**
+     * This is suppose to set the rate of change in the diffusion zones, however does not seem to work and I can not
+     * figure out why....
+     */
     public void setMetabolicRate(){
         setVO2();
-        System.out.println("Test w/ kelsey vo2: " + vo2);
-        System.out.println("-vo2 * (1.2 / heart.calculateBeatsPerSecond()) = " + (-vo2 * (1.2 / heart.calculateBeatsPerSecond())));
         blood.setMetabolicRate(
                 vo2 * Math.abs(heart.calculateBeatsPerSecond() - 1.2),
                 vo2 /(calculateVco2()));
@@ -96,16 +98,10 @@ public class Body {
         return (vo2 * (1.2 / heart.calculateBeatsPerSecond())) * .125;
     }
 
-    public boolean isSmoker() {
-        return smoker;
-    }
-
-    public void setSmoker(boolean smoker) {
-        this.smoker = smoker;
-    }
-
-
-
+    /**
+     * Not Currently used but it is another implementation
+     * @return multiplier that corresponds with fitness value
+     */
     public double getFitnessLevelMulitiplier() {
 
         if (fitnessLevel == 0) {
@@ -132,7 +128,6 @@ public class Body {
         private double conductingZoneMax = totalLungCapacity * .8;
         private double respiratoryZoneSize = totalLungCapacity * .2;    // <-- This is where gas exchange happens
         private double currentConductingZoneVolume;
-
         private double conductionZoneO2;
         private double conductionZoneCO2;
         private double respiratoryZoneO2;
@@ -157,6 +152,8 @@ public class Body {
             this.inhale = true;
             this.exhale = false;
             this.breathHeld = false;
+
+            // SOme initial values based on average resting rates
             currentConductingZoneVolume = conductingZoneMax *.2;
 
             respiratoryRate = 12;
@@ -173,6 +170,11 @@ public class Body {
 
         }
 
+        /**
+         * In the current implementation the result here is mostly cosmetic, but in the future
+         * the actual size of the lung can be saved at any given moment and one could calculate
+         * how much oxygen is in reserve
+         */
         public void breathe(){
 
 
@@ -183,7 +185,7 @@ public class Body {
                 breathLength = (600/respiratoryRate) * .5; // <-- converting from min to 10ths of a second
                 breathCounter++;
 
-                // If
+                // When the breath counter is reached, switch direction and reset counter
                 if (breathCounter >= breathLength) {
                     breathCounter -= breathLength;
                     if (inhale) {
@@ -196,7 +198,7 @@ public class Body {
                     }
                 } else {
                     if (inhale) {
-                        expandLungs(respiratoryDepth/breathLength);
+                        expandLungs(respiratoryDepth/breathLength); // Not currently useful
                     } else {
                         contractLungs(respiratoryDepth/breathLength);
                     }
@@ -206,10 +208,11 @@ public class Body {
             }
 
 
-
-
         }
 
+        /**
+         * Total ventilation, rate * depth, determines the o2 assignment value in lungs
+         */
         private void setTotalVentilation() {
             totalVentilation = respiratoryRate * respiratoryDepth;
             totalVentilation = smoker ? totalVentilation : totalVentilation * .8;
@@ -228,11 +231,20 @@ public class Body {
             }
         }
 
+        /**
+         * Not useful in current implementation
+         * @param totalTickLungExpansion
+         */
         public void expandLungs(double totalTickLungExpansion){
             conductionZoneO2 += totalTickLungExpansion * .2;
             currentConductingZoneVolume += totalTickLungExpansion;
         }
 
+
+        /**
+         * Not useful in current implementation
+         * @param totalTickLungContraction
+         */
         public void contractLungs(double totalTickLungContraction){
             if(conductionZoneO2 > 0) {
                 conductionZoneO2 -= totalTickLungContraction * .5;
@@ -243,6 +255,10 @@ public class Body {
             }
         }
 
+        /**
+         * Gives the appropriate string to the display GUI
+         * @return return
+         */
         public String getBreathState(){
             if (breathHeld) {
                 return "Breath held";
@@ -251,6 +267,11 @@ public class Body {
             }
         }
 
+        /**
+         * Not in current implementation
+         * @param gas string of the gas needed, always "o2" or "co2"
+         * @return
+         */
         public double getGasReadings(String gas) {
             if (gas.equals("o2")) {
                 return conductionZoneO2 + respiratoryZoneO2;
@@ -259,27 +280,6 @@ public class Body {
             }
         }
 
-        public void increaseRespiratoryDepthValue(){
-            respiratoryDepth += .25;
-
-        }
-
-
-        public void setRespiratoryRate(double respiratoryRate) {
-            this.respiratoryRate = respiratoryRate;
-        }
-
-        public double getRespiratoryRate() {
-            return respiratoryRate;
-        }
-
-        public double getRespiratoryDepth() {
-            return respiratoryDepth;
-        }
-
-        public void setRespiratoryDepth(double respiratoryDepth) {
-            this.respiratoryDepth = respiratoryDepth;
-        }
 
         public double getTotalVentilation(){return totalVentilation;}
     }
@@ -306,7 +306,6 @@ public class Body {
             // Controls speed of heart pumping
             bloodPumpCounter++;
 
-            System.out.println("HeartRateperTick: " + calculateHeartRate() );
             if (bloodPumpCounter >= calculateHeartRate()) {
                 bloodPumpCounter -= calculateHeartRate();
                 blood.circulate();
@@ -339,6 +338,7 @@ public class Body {
 
     /**
      * This class handles negative feedback loops and links lung/heart behavior with nutrient/waste levels in blood
+     * CNS stands for central nervous system
      */
     public class CNS{
 
@@ -354,6 +354,7 @@ public class Body {
         CNS(Heart heart, Lungs lungs){
             this.heart = heart;
             this.lungs = lungs;
+            resolutionCounter = 0;
         }
 
         public void getHeartReadings(){
@@ -361,57 +362,61 @@ public class Body {
             arterialCO2 = blood.getReading(0,"co2");
         }
 
+        /**
+         * This method is supposed to tweak the lungs and heart to respond to lowered co2 and o2 levels, it doesn't though!
+         */
         public void resolveImbalance(){
+            resolutionCounter++;
             getHeartReadings();
-            String cnsString = "--------------\n";
 
-            if (arterialO2 < 95) {
-                lungs.respiratoryDepth += .19;
-                cnsString += "Increasing Respiratory Depth\n";
+
+            if (resolutionCounter == 5) {   // <--- Just to slow down the descent into madness that happens every time
+                String cnsString = "--------------\n";
+                resolutionCounter = 0;
+                if (arterialO2 < 95) {
+                    lungs.respiratoryDepth += .19;
+                    cnsString += "Increasing Respiratory Depth\n";
+                }
+
+                if (arterialO2 > 99 && lungs.respiratoryDepthSetPoint < lungs.respiratoryDepth) {
+                    lungs.respiratoryDepth -= .19;
+                    cnsString += "Decreasing Respiratory Depth\n";
+                }
+
+                if (arterialO2 < 85 && lungs.respiratoryRateSetPoint < lungs.respiratoryRate) {
+                    lungs.respiratoryRate++;
+                    cnsString += "Increasing Respiratory Rate\n";
+                } else if (arterialO2 > 92) {
+                    lungs.respiratoryRate--;
+                    cnsString += "Decreasing Respiratory Rate\n";
+                }
+
+                if (arterialO2 < 80) {
+                    heart.beatsPerMinute++;
+                    cnsString += "Increasing Heart Rate\n";
+                }
+
+                if (arterialO2 > 90) {
+                    heart.beatsPerMinute--;
+                    cnsString += "Decreasing Heart Rate\n";
+                }
+                cnsTextString = cnsString;
+
             }
 
-            if (arterialO2 > 99 && lungs.respiratoryDepthSetPoint < lungs.respiratoryDepth) {
-                lungs.respiratoryDepth -= .19;
-                cnsString += "Decreasing Respiratory Depth\n";
-            }
-
-            if (arterialO2 < 85 && lungs.respiratoryRateSetPoint < lungs.respiratoryRate) {
-                lungs.respiratoryRate++;
-                cnsString += "Increasing Respiratory Rate\n";
-            } else if (arterialO2 > 92) {
-                lungs.respiratoryRate--;
-                cnsString += "Decreasing Respiratory Rate\n";
-            }
-
-            if (arterialO2 < 80) {
-                heart.beatsPerMinute++;
-                cnsString += "Increasing Heart Rate\n";
-            }
-
-            if (arterialO2 > 90) {
-                heart.beatsPerMinute --;
-                cnsString += "Decreasing Heart Rate\n";
-            }
-
-            cnsTextString = cnsString;
 
         }
 
-
+        /**
+         * For the CNS stream in the main GUI
+         * @return
+         */
         public String getCNSText(){
             return cnsTextString;
         }
 
         }
 
-        public void increaseBPM(){
-
-        }
-
-
-        public void increaseBreathDepth(){
-            lungs.increaseRespiratoryDepthValue();
-        }
 
     }
 

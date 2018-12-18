@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.util.ArrayList;
 
 public class displayGUI extends JFrame{
     private JPanel displayPanel;
@@ -8,17 +7,10 @@ public class displayGUI extends JFrame{
     private JLabel arterialCO2Label;
     private JLabel venousO2Label;
     private JLabel venousCO2Label;
-    private JLabel co2ConsumptionLabel;
-    private JLabel totalO2BurnedLabel;
-    private JLabel totalCO2ProducedLabel;
     private JLabel breathStatusLabel;
-    private JLabel o2InLungsLabel;
-    private JLabel co2InLungsLabel;
-    private JLabel HeaderStringLabel;
     private JTextArea cnsTextArea;
     private JLabel circulationPercentLabel;
     private JLabel circulationCountLabel;
-    private ArrayList<JLabel> allLabels;
     private JLabel totalVentilationLabel;
     private JLabel alveolarVentilationLabel;
     private JLabel lungO2AssignerLabel;
@@ -27,17 +19,11 @@ public class displayGUI extends JFrame{
     private JLabel diffZoneO2AssignerLabel;
     private JLabel beatsPerMinuteLabel;
     private JLabel diffZoneCO2AssignerLabel;
+    private JLabel headerStringLabel;
 
-
-    // Variables for body and mainGUI
     private Body body;
-    private mainGUI mainGUI;
+    private mainGUI mainGUI;  //<-- not used in this implementation
 
-    // Variables to be displayed
-    private double PvO2Value;
-    private double PvCO2Value;
-    private double PaO2Value;
-    private double PaCO2Value;
 
     private int getReadingsCounter;
 
@@ -76,6 +62,9 @@ public class displayGUI extends JFrame{
     }
 
 
+    /**
+     * Gets all the readings from the body object and applies them to GUI
+     */
     public void getReadings(){
         getReadingsCounter++;
         if (getReadingsCounter == 5) {
@@ -110,6 +99,10 @@ public class displayGUI extends JFrame{
         }
     }
 
+    /**
+     * Converts activity level to appropriate string
+     * @return string that matches activity levels
+     */
     public String activityLevelToString(){
         if (BodyConfig.activityLevel == 1) {
             return "Rest";

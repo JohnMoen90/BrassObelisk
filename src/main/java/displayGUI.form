@@ -8,11 +8,11 @@
     <properties>
       <font size="16"/>
       <minimumSize width="912" height="714"/>
-      <preferredSize width="456" height="358"/>
+      <preferredSize width="900" height="700"/>
     </properties>
     <border type="none" title="Respiratory System"/>
     <children>
-      <component id="d3d0a" class="javax.swing.JLabel" binding="HeaderStringLabel">
+      <component id="d3d0a" class="javax.swing.JLabel" binding="headerStringLabel">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>

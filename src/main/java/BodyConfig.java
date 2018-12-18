@@ -31,8 +31,10 @@ public class BodyConfig {
     static final int LUNG_ENV_ID = 4;
 
 
-
-
+    /**
+     * Below are many, many fields that are not used, but for quick swap testing and completeness I am leaving them
+     * here
+     */
     static double secO2Consumption = .4167; // ml/sec
     static double tickO2Consumption = secO2Consumption * 10; // ml/sec
 
@@ -59,6 +61,10 @@ public class BodyConfig {
     static double bloodUnitMax02Saturation = 203; //ml/L
 
 
+    /**
+     * Initialized some values
+     * @param selectedProfile profile to initialize
+     */
     public static void setStartValues(Profile selectedProfile) {
         // Main variables
         bodyWeight = selectedProfile.getWeight(); // kg

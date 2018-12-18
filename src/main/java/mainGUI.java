@@ -18,11 +18,9 @@ public class mainGUI extends JFrame {
     private JComboBox<String> profilesComboBox;
     private JButton saveNewProfileButton;
     private JTextField profileNameTextField;
-    private JTextField lastNameTextField;
     private JTextField bodyWeightTextField;
     private JButton deleteProfileButton;
     private JSlider activityLevelSlider;
-    private JButton exitProgramButton;
     private boolean running;
 
     private ArrayList<Profile> profiles;
@@ -54,10 +52,6 @@ public class mainGUI extends JFrame {
 
         body = new Body();
         this.displayGUI = new displayGUI(body, this);
-
-        // Set default values from bodyConfig
-        beatsperMinute = 70;
-        diffusionRate = 2;
 
         setContentPane(mainPanel);
         pack();
