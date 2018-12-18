@@ -69,6 +69,19 @@ public class mainGUI extends JFrame {
             }
         });
 
+        smokerCheckBox.addChangeListener(e -> {
+            if (!smokerCheckBox.isSelected()) {
+                body.setSmoker(true);
+            } else {
+                body.setSmoker(false);
+            }
+        });
+
+        phyTrainingComboBox.addActionListener(e -> {
+            BodyConfig.exerciseXP = (String) phyTrainingComboBox.getSelectedItem();
+
+        });
+
 
     }
 

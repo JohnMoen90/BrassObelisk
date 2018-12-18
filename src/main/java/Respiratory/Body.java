@@ -3,13 +3,16 @@ package Respiratory;
 /**
  * The Body class manages the inner body components - blood, lungs, heart, and cns or central nervous system
  * All variables that the user can influence are imported from BodyConfig and mainGUI
+ *
+ * Some Scrap Code/Notes:
+ *     private double Vo2 = (17 * bodyWeight) / 60; // ml perSecond
+ *     private double Vco2 = (1.1 * bodyWeight) / 60; // ml perSecond
+ *
  */
 public class Body {
 
     // Initialize some variables
     private double bodyWeight = BodyConfig.bodyWeight;
-//    private double Vo2 = (17 * bodyWeight) / 60; // ml perSecond
-//    private double Vco2 = (1.1 * bodyWeight) / 60; // ml perSecond
 
     // "Body objects" - blood, lungs, cns, and heart
     private static Blood blood;
@@ -17,9 +20,16 @@ public class Body {
     private Heart heart;
     private CNS cns;
 
-    private int changeAssignersCounter;
+    private int changeAssignersCounter; // To mark off one second refresh
 
-    private double vo2;
+    private double vo2; // Amount
+
+    private boolean smoker;
+
+
+
+    private String exerciseXP;
+    private double exerciseXPMulitiplier;
 
     // Constructor
     Body(){
@@ -38,7 +48,7 @@ public class Body {
     public void manageTurn(){
         calculateGasAssignment();
         lungs.breathe();
-        blood.diffuse();
+//        blood.diffuse();
         heart.pumpBlood();
 
     }
@@ -76,6 +86,42 @@ public class Body {
 
     public double calculateVco2(){
         return (vo2/((double)heart.calculateBeatsPerSecond()/1.2)) * .125;
+    }
+
+    public boolean isSmoker() {
+        return smoker;
+    }
+
+    public void setSmoker(boolean smoker) {
+        this.smoker = smoker;
+    }
+
+    public String getExerciseXP() {
+        return exerciseXP;
+    }
+
+    public void setExerciseXP(String exerciseXP) {
+        this.exerciseXP = exerciseXP;
+        setMetabolicRate();
+    }
+
+    public double getExerciseXPMulitiplier() {
+        return exerciseXPMulitiplier;
+    }
+
+    public void setExerciseXPMulitiplier() {
+        double multiplier = 1;
+        if (exerciseXP.equals("No training")) {
+            multiplier = 1;
+        } else if (exerciseXP.equals("Little training")) {
+            multiplier = .9;
+        } else if (exerciseXP.equals("Moderate training")) {
+            multiplier = .8;
+        } else if (exerciseXP.equals("Highly Trained")) {
+            multiplier = .7;
+        }
+
+        this.exerciseXPMulitiplier = multiplier;
     }
 
 
@@ -152,6 +198,7 @@ public class Body {
 
                 }
             }
+
 
 
         }
