@@ -1,5 +1,3 @@
-package Respiratory;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +14,7 @@ public class mainGUI extends JFrame {
     private JButton StartButton;
     private JCheckBox smokerCheckBox;
     private JTextField bodyWieghtTextField;
+    private JComboBox comboBox1;
     private boolean running;
 
     private displayGUI displayGUI;
@@ -66,6 +65,22 @@ public class mainGUI extends JFrame {
             } else {
                 StartButton.setText("Start");
                 running = false;
+            }
+
+            String rawInput = bodyWieghtTextField.getText();
+            try {
+                BodyConfig.bodyWeight = Integer.parseInt(rawInput);
+                if (!running) {
+                    StartButton.setText("Stop");
+                    running = true;
+                } else {
+                    StartButton.setText("Start");
+                    running = false;
+                }
+            }
+            catch (NumberFormatException nfe) {
+                bodyWieghtTextField.setText("Integers only! (def: 70Kg)");
+
             }
         });
 

@@ -1,5 +1,3 @@
-package Respiratory;
-
 public class Main {
 
 

@@ -1,5 +1,3 @@
-package Respiratory;
-
 /**
  * The Body class manages the inner body components - blood, lungs, heart, and cns or central nervous system
  * All variables that the user can influence are imported from BodyConfig and mainGUI
@@ -22,19 +20,20 @@ public class Body {
 
     private int changeAssignersCounter; // To mark off one second refresh
 
-    private double vo2; // Amount
+    private double vo2; // Amount of O2 needed
 
     private boolean smoker;
 
-
-
     private String exerciseXP;
     private double exerciseXPMulitiplier;
+
 
     // Constructor
     Body(){
         changeAssignersCounter = 0;
         vo2 = 40;
+        smoker = false;
+
         blood = new Blood(bodyWeight, BodyConfig.strokeVolume);
         this.lungs = new Lungs(blood);
         this.heart = new Heart(blood);
@@ -48,8 +47,7 @@ public class Body {
     public void manageTurn(){
         calculateGasAssignment();
         lungs.breathe();
-//        blood.diffuse();
-        heart.pumpBlood();
+        heart.pumpBlood();      // Diffusion currently happens here
 
     }
 
@@ -61,11 +59,11 @@ public class Body {
      */
     public Blood bloodReadings() { return blood; }
     public Lungs lungReadings()  { return lungs; }
-    public Heart heartReadings() { return heart; }
+    public Heart heartReadings() { return heart; }       // <-- Not all used now but for future expansion may be useful
     public CNS cnsReadings()     { return cns;   }
 
 
-    public String getBreathStatus(){
+    public String getBreathStatus(){    // <-- For GUI
         return lungs.getBreathState();
     }
 
@@ -80,7 +78,8 @@ public class Body {
 
     public void setMetabolicRate(){
 
-        blood.setMetabolicRate(-(vo2 /((double)heart.calculateBeatsPerSecond()/1.2)),
+        blood.setMetabolicRate(
+                -(vo2 /((double)heart.calculateBeatsPerSecond()/1.2)),
                 vo2 /(calculateVco2()));
     }
 
@@ -147,7 +146,11 @@ public class Body {
         private boolean exhale;
 
         private double respiratoryRate;
+        private double respiratoryRateSetPoint;
         private double respiratoryDepth;    //Percentage of conductionZone
+        private double respiratoryDepthSetPoint;
+        private double totalVentilation;
+        private double totalVentilationSetpoint;
         private double breathLength;
         private double breathCounter;
 
@@ -158,13 +161,20 @@ public class Body {
             this.exhale = false;
             this.breathHeld = false;
             currentConductingZoneVolume = conductingZoneMax *.2;
+
             respiratoryRate = 12;
-//            maxRespiratoryRate =60;
+            respiratoryRateSetPoint = respiratoryRate;
+
             respiratoryDepth = conductingZoneMax * .25;
+            respiratoryDepthSetPoint = conductingZoneMax * respiratoryDepth;
+
+            totalVentilationSetpoint = respiratoryRate * respiratoryDepth;
+
+
+//
             respiratoryZoneO2 = respiratoryZoneSize * .2;
             respiratoryZoneCO2 = respiratoryZoneSize * .1;
 
-//            respiratoryRateValue;
 
         }
 
@@ -184,6 +194,7 @@ public class Body {
                     if (inhale) {
                         exhale = true;
                         inhale = false;
+                        setTotalVentilation();
                     } else {
                         inhale = true;
                         exhale = true;
@@ -201,6 +212,24 @@ public class Body {
 
 
 
+
+        }
+
+        private void setTotalVentilation() {
+            totalVentilation = respiratoryRate * respiratoryDepth;
+            if (totalVentilation < 3.2) {
+                blood.setLungValues(40,-5);
+            } else if (totalVentilation < 4) {
+                blood.setLungValues(45,-6);
+            } if (totalVentilation < 5) {
+                blood.setLungValues(50,-7);
+            } if (totalVentilation < 7) {
+                blood.setLungValues(55,-8);
+            } if (totalVentilation < 9) {
+                blood.setLungValues(60,-10);
+            } else {
+                blood.setLungValues(65,-11);
+            }
         }
 
         public void expandLungs(double totalTickLungExpansion){
@@ -235,6 +264,7 @@ public class Body {
         }
 
         public void increaseRespiratoryDepthValue(){
+            respiratoryDepth += .25;
 
         }
 
@@ -330,12 +360,25 @@ public class Body {
 
             if (resolutionCounter > 0) {
                 resolutionCounter--;
+            } else if (arterialO2 < 100) {
+                resolutionCounter += 10;
+                for (int i = 0; i < 100 - arterialO2; i++) {
+
+                    if (i % 2 == 0){
+                        increaseBreathDepth();}
+                    else {
+                        increaseBreathRate();
+                    }
+                }
+
             }
 
-            if (arterialO2 < 100) {
-                resolutionCounter += 10;
-                increaseBreathDepth();
-                return;
+            if (lungs.respiratoryRate > lungs.respiratoryRateSetPoint) {
+                lungs.respiratoryRate -= .25;
+            }
+            if (lungs.respiratoryDepth > lungs.respiratoryDepthSetPoint) {
+                lungs.respiratoryRate -= .25;
+            }
             }
         }
 
@@ -344,7 +387,7 @@ public class Body {
         }
 
         public void increaseBreathRate(){
-
+            lungs.respiratoryRate += 1;
         }
 
         public void increaseBreathDepth(){
@@ -352,4 +395,4 @@ public class Body {
         }
 
     }
-}
+
