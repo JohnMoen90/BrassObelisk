@@ -1,6 +1,8 @@
+import javax.print.attribute.standard.NumberUp;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * This GUI contains the Body object which is used to calculate the output on displayGUI, and gives the user control of
@@ -13,9 +15,16 @@ public class mainGUI extends JFrame {
     private String[] phyTrainingOptions = {"No training", "Little Training", "Moderate Training", "Highly Trained"};
     private JButton StartButton;
     private JCheckBox smokerCheckBox;
-    private JTextField bodyWieghtTextField;
-    private JComboBox comboBox1;
+    private JTextField ageTextField;
+    private JComboBox profilesComboBox;
+    private JButton saveNewProfileButton;
+    private JTextField firstNameTextField;
+    private JTextField lastNameTextField;
+    private JTextField bodyWeightTextField;
+    private JButton exitProgramButton;
     private boolean running;
+
+    private ArrayList<Profile> profiles;
 
     private displayGUI displayGUI;
     private Body body;
@@ -30,8 +39,7 @@ public class mainGUI extends JFrame {
 
         this.body = new Body();
         this.displayGUI = new displayGUI(body, this);
-
-        Counter counter = new Counter();
+        profiles = ProfileIO.getAllProfiles();
 
         // Set default values from bodyConfig
         beatsperMinute = 70;
@@ -67,21 +75,6 @@ public class mainGUI extends JFrame {
                 running = false;
             }
 
-            String rawInput = bodyWieghtTextField.getText();
-            try {
-                BodyConfig.bodyWeight = Integer.parseInt(rawInput);
-                if (!running) {
-                    StartButton.setText("Stop");
-                    running = true;
-                } else {
-                    StartButton.setText("Start");
-                    running = false;
-                }
-            }
-            catch (NumberFormatException nfe) {
-                bodyWieghtTextField.setText("Integers only! (def: 70Kg)");
-
-            }
         });
 
         smokerCheckBox.addChangeListener(e -> {
@@ -97,33 +90,32 @@ public class mainGUI extends JFrame {
 
         });
 
+        exitProgramButton.addActionListener(e -> {
+
+        });
 
     }
 
-    public class Counter{
 
-        private int count;
+    public void addNewProile() {
 
-        public Counter(){
-            count = 0;
+        try {
+            int age = Integer.parseInt(ageTextField.getText());
+            int weight = Integer.parseInt(ageTextField.getText());
+            profiles.add(new Profile(
+                    firstNameTextField.getText(),
+                    lastNameTextField.getText(),
+                    age,
+                    weight,
+                    phyTrainingComboBox.getSelectedIndex(),
+                    smokerCheckBox.isSelected()));
+        }
+        catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(rootPane,"Please only use numeric fields in age and weight fields");
         }
 
-        public int getCount() {
-            return count;
-        }
-
-        public void addOne(){
-            count++;
-        }
-
-        public void reset(){
-            count = 0;
-        }
-
-        public void setCount(int count) {
-            this.count = count;
-        }
     }
+
 
 
 }

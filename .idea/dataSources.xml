@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="BodyTemplates" uuid="48c74045-5470-4cbf-93c6-9b7eebd8f74f">
+    <data-source source="LOCAL" name="profiles" uuid="e00aa293-21b0-4957-a4f3-246d48753dd5">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
-      <remarks>Templates for initializing starting and range values</remarks>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/src/main/java/FirstDraft\BodyTemplates</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/databases\profiles</jdbc-url>
       <driver-properties>
         <property name="enable_load_extension" value="true" />
       </driver-properties>
