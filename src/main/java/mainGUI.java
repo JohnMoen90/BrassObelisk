@@ -20,6 +20,7 @@ public class mainGUI extends JFrame {
     private JTextField profileNameTextField;
     private JTextField lastNameTextField;
     private JTextField bodyWeightTextField;
+    private JButton deleteProfileButton;
     private JButton exitProgramButton;
     private boolean running;
 
@@ -111,7 +112,7 @@ public class mainGUI extends JFrame {
         });
 
         profilesComboBox.addActionListener(e -> {
-            setProfileComboBox();
+
             for (Profile profile: profiles) {
                 if (profile.getProfileName().equals(profilesComboBox.getSelectedItem())) {
                     selectedProfile = profile;
@@ -121,6 +122,17 @@ public class mainGUI extends JFrame {
                     phyTrainingComboBox.setSelectedIndex(profile.getFitnessLevel());
                     smokerCheckBox.setSelected(profile.isSmoker());
 //                    generateBody(profile);
+                }
+            }
+
+        });
+
+        deleteProfileButton.addActionListener(e -> {
+
+            for (Profile profile: profiles) {
+                if (profile.getProfileName().equals(profilesComboBox.getSelectedItem())) {
+                    ProfileIO.deleteProfile(profile);
+                    setProfileComboBox();
                 }
             }
 
@@ -151,7 +163,7 @@ public class mainGUI extends JFrame {
         else {
             try {
                 int age = Integer.parseInt(ageTextField.getText());
-                int weight = Integer.parseInt(ageTextField.getText());
+                int weight = Integer.parseInt(bodyWeightTextField.getText());
                 boolean unique = ProfileIO.addNewProfile(new Profile(
                         profileNameTextField.getText(),
                         age,

@@ -109,4 +109,26 @@ public class ProfileIO {
 //
 //
     }
+
+    public static boolean deleteProfile(Profile profile) {
+
+            String deleteProfileSql = "DELETE FROM user_profiles WHERE profile_name LIKE ?";
+
+            try (Connection conn = DriverManager.getConnection(DB_URL) ;
+                 PreparedStatement deleteProfilePS = conn.prepareStatement(deleteProfileSql)) {
+
+                deleteProfilePS.setString(1, profile.getProfileName());
+                return deleteProfilePS.execute();
+
+            }
+
+            catch (SQLException sqle) {
+                System.out.println("Something happened...");
+                sqle.printStackTrace();
+            }
+
+            return false;
+
+
+    }
 }
