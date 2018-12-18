@@ -24,8 +24,7 @@ public class Body {
 
     private boolean smoker;
 
-    private String exerciseXP;
-    private double exerciseXPMulitiplier;
+    private int fitnessLevel;
 
 
     // Constructor
@@ -33,6 +32,7 @@ public class Body {
         changeAssignersCounter = 0;
         vo2 = 40;
         smoker = false;
+        fitnessLevel = 0;
 
         blood = new Blood(bodyWeight, BodyConfig.strokeVolume);
         this.lungs = new Lungs(blood);
@@ -95,32 +95,24 @@ public class Body {
         this.smoker = smoker;
     }
 
-    public String getExerciseXP() {
-        return exerciseXP;
-    }
 
-    public void setExerciseXP(String exerciseXP) {
-        this.exerciseXP = exerciseXP;
+    public void setActivityLevel(int activityLevel) {
+
         setMetabolicRate();
     }
 
-    public double getExerciseXPMulitiplier() {
-        return exerciseXPMulitiplier;
-    }
+    public double getFitnessLevelMulitiplier() {
 
-    public void setExerciseXPMulitiplier() {
-        double multiplier = 1;
-        if (exerciseXP.equals("No training")) {
-            multiplier = 1;
-        } else if (exerciseXP.equals("Little training")) {
-            multiplier = .9;
-        } else if (exerciseXP.equals("Moderate training")) {
-            multiplier = .8;
-        } else if (exerciseXP.equals("Highly Trained")) {
-            multiplier = .7;
+        if (fitnessLevel == 0) {
+            return 1;
+        } else if (fitnessLevel == 1) {
+            return .9;
+        } else if (fitnessLevel == 2) {
+            return .8;
+        } else {
+            return .7;
         }
 
-        this.exerciseXPMulitiplier = multiplier;
     }
 
 
@@ -170,8 +162,6 @@ public class Body {
 
             totalVentilationSetpoint = respiratoryRate * respiratoryDepth;
 
-
-//
             respiratoryZoneO2 = respiratoryZoneSize * .2;
             respiratoryZoneCO2 = respiratoryZoneSize * .1;
 
@@ -217,18 +207,19 @@ public class Body {
 
         private void setTotalVentilation() {
             totalVentilation = respiratoryRate * respiratoryDepth;
+            totalVentilation = smoker ? totalVentilation : totalVentilation * .8;
             if (totalVentilation < 3.2) {
                 blood.setLungValues(40,-5);
             } else if (totalVentilation < 4) {
-                blood.setLungValues(45,-6);
+                blood.setLungValues(43,-6);
             } if (totalVentilation < 5) {
-                blood.setLungValues(50,-7);
+                blood.setLungValues(46,-7);
             } if (totalVentilation < 7) {
-                blood.setLungValues(55,-8);
+                blood.setLungValues(49,-8);
             } if (totalVentilation < 9) {
-                blood.setLungValues(60,-10);
+                blood.setLungValues(52,-10);
             } else {
-                blood.setLungValues(65,-11);
+                blood.setLungValues(55,-11);
             }
         }
 
@@ -284,12 +275,14 @@ public class Body {
         public void setRespiratoryDepth(double respiratoryDepth) {
             this.respiratoryDepth = respiratoryDepth;
         }
+
+        public double getTotalVentilation(){return totalVentilation;}
     }
 
     /**
      * This class handles heart rate and sends some signals to the CNS
      */
-    private class Heart{
+    public class Heart{
 
         private int beatsPerMinute = 70; // BeatsPerMinute
         private int heartRate; // milliseconds
@@ -330,12 +323,16 @@ public class Body {
         public void setHeartRate(int heartRate) {
             this.heartRate = heartRate;
         }
+
+        public int getBeatsPerMinute(){
+            return beatsPerMinute;
+        }
     }
 
     /**
      * This class handles negative feedback loops and links lung/heart behavior with nutrient/waste levels in blood
      */
-    private class CNS{
+    public class CNS{
 
         Heart heart;
         Lungs lungs;
@@ -344,6 +341,7 @@ public class Body {
         double arterialCO2;
 
         int resolutionCounter;
+        String cnsTextString;
 
         CNS(Heart heart, Lungs lungs){
             this.heart = heart;
@@ -351,44 +349,55 @@ public class Body {
         }
 
         public void getHeartReadings(){
-            arterialO2 = blood.getReading(0,"O2");
-            arterialCO2 = blood.getReading(0,"CO2");
+            arterialO2 = blood.getReading(0,"o2");
+            arterialCO2 = blood.getReading(0,"co2");
         }
 
         public void resolveImbalance(){
             getHeartReadings();
+            String cnsString = "--------------\n";
 
-            if (resolutionCounter > 0) {
-                resolutionCounter--;
-            } else if (arterialO2 < 100) {
-                resolutionCounter += 10;
-                for (int i = 0; i < 100 - arterialO2; i++) {
-
-                    if (i % 2 == 0){
-                        increaseBreathDepth();}
-                    else {
-                        increaseBreathRate();
-                    }
-                }
-
+            if (arterialO2 < 95) {
+                lungs.respiratoryDepth += .19;
+                cnsString += "Increasing Respiratory Depth\n";
+            } else if (arterialO2 > 99) {
+                lungs.respiratoryDepth -= .19;
+                cnsString += "Decreasing Respiratory Depth\n";
             }
 
-            if (lungs.respiratoryRate > lungs.respiratoryRateSetPoint) {
-                lungs.respiratoryRate -= .25;
+            if (arterialO2 < 85) {
+                lungs.respiratoryRate++;
+                cnsString += "Increasing Respiratory Rate\n";
+            } else if (arterialO2 > 92) {
+                lungs.respiratoryRate--;
+                cnsString += "Decreasing Respiratory Rate\n";
             }
-            if (lungs.respiratoryDepth > lungs.respiratoryDepthSetPoint) {
-                lungs.respiratoryRate -= .25;
+
+            if (arterialO2 < 80) {
+                heart.beatsPerMinute++;
+                cnsString += "Increasing Heart Rate\n";
             }
+
+            if (arterialO2 > 90) {
+                heart.beatsPerMinute --;
+                cnsString += "Decreasing Heart Rate\n";
             }
+
+            cnsTextString = cnsString;
+
+        }
+
+
+        public String getCNSText(){
+            return cnsTextString;
+        }
+
         }
 
         public void increaseBPM(){
 
         }
 
-        public void increaseBreathRate(){
-            lungs.respiratoryRate += 1;
-        }
 
         public void increaseBreathDepth(){
             lungs.increaseRespiratoryDepthValue();

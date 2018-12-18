@@ -222,6 +222,19 @@ public class Blood {
         pulmonaryBlood.setGasAssigner("co2", co2Value);
     }
 
+    public double getDiffusionZoneAssigners(int bloodEnvironmentID, String gas) {
+        for (BloodEnvironment bloodEnvironment : allBloodEnvs) {
+            if (bloodEnvironment.bloodEnvID == bloodEnvironmentID) {
+                if (gas.equals("o2")) {
+                    return bloodEnvironment.o2Assigner;
+                } else {
+                    return bloodEnvironment.co2Assigner;
+                }
+            }
+        }
+        return 0.0;
+    }
+
     /**
      * This method equalizes gas pressures between every blood unit and their environment
      */
@@ -631,9 +644,11 @@ public class Blood {
 
         public void diffuse(){
             BloodEnvironment ce = getCurrentEnvironment();
-            po2 += perTickO2Change;
+            if (po2 < 100 && getCurrentEnvironment().o2Assigner > 0) {po2 += perTickO2Change;}
+            if (po2 > 40 && getCurrentEnvironment().o2Assigner < 0) {po2 += perTickO2Change;}
             ce.setTotalO2Diffused(ce.getTotalO2Diffused() + perTickO2Change);
-            pco2 += perTickCO2Change;
+            if (po2 < 50 && getCurrentEnvironment().o2Assigner > 0) {po2 += perTickO2Change;}
+            if (po2 > 40 && getCurrentEnvironment().o2Assigner < 0) {po2 += perTickO2Change;}
             ce.setTotalCO2Diffused(ce.getTotalCO2Diffused() + perTickCO2Change);
         }
 

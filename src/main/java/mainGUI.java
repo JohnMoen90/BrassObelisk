@@ -74,8 +74,8 @@ public class mainGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (running) {
-                    displayGUI.getReadings();
                     body.manageTurn();
+                    displayGUI.getReadings();
                 }
             }
         }).start();

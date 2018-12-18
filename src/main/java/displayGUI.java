@@ -25,6 +25,7 @@ public class displayGUI extends JFrame{
     private JLabel lungCO2AssignerLabel;
     private JLabel ActivityLevelLabel;
     private JLabel diffZoneO2AssignerLabel;
+    private JLabel beatsPerMinuteLabel;
     private JLabel diffZoneCO2AssignerLabel;
 
 
@@ -83,25 +84,30 @@ public class displayGUI extends JFrame{
         if (getReadingsCounter == 5) {
             getReadingsCounter -= 5;
 
-            arterialO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(1, "o2")));
-            arterialCO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(1, "co2")));
+            arterialO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(0, "o2")));
+            arterialCO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(0, "co2")));
             venousO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(3, "o2")));
             venousCO2Label.setText(String.format("%.2f", body.bloodReadings().getReading(3, "co2")));
 
+            beatsPerMinuteLabel.setText(String.format("%d",body.heartReadings().getBeatsPerMinute()));
             circulationCountLabel.setText(String.format("%d", body.bloodReadings().getCirculations()));
             double percentage = ((double)body.bloodReadings().getQueuePositionsTraveled()/
                                 (double) body.bloodReadings().getBloodUnitTotal())*100.00;
             circulationPercentLabel.setText(String.format("%.2f %s", percentage,"%"));
 
             bloodUnitTextArea.setText(body.bloodReadings().getBloodUnitString(10));
+            cnsTextArea.setText(body.cnsReadings().getCNSText());
 
-//            totalO2BurnedLabel.setText(String.format("%.2f", body.bloodReadings().getTotalO2Consumed()));
-//            totalCO2ProducedLabel.setText(String.format("%.2f", body.bloodReadings().getTotalO2Consumed()));
+            diffZoneO2AssignerLabel.setText(String.format("%.2f",body.bloodReadings().getDiffusionZoneAssigners(2, "o2")));
+            diffZoneCO2AssignerLabel.setText(String.format("%.2f",body.bloodReadings().getDiffusionZoneAssigners(2, "co2")));
 
 
             breathStatusLabel.setText(body.getBreathStatus());
-            co2InLungsLabel.setText(String.format("%.2f", body.lungReadings().getGasReadings("co2")));
-            o2InLungsLabel.setText(String.format("%.2f", body.lungReadings().getGasReadings("o2")));
+            totalVentilationLabel.setText(String.format("%.2f",body.lungReadings().getTotalVentilation()));
+            alveolarVentilationLabel.setText(String.format("%.2f",body.lungReadings().getTotalVentilation() * .2));
+            totalVentilationLabel.setText(String.format("%.2f",body.lungReadings().getTotalVentilation()));
+            lungO2AssignerLabel.setText(String.format("%.2f",body.bloodReadings().getDiffusionZoneAssigners(4, "o2")));
+            lungCO2AssignerLabel.setText(String.format("%.2f",body.bloodReadings().getDiffusionZoneAssigners(4, "co2")));
         }
     }
 }
