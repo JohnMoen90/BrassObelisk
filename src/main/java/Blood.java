@@ -242,15 +242,15 @@ public class Blood {
 
                     // Prints bloodUnit stats for the same bloodUnit each second for testing reasons
                     if (bloodUnit.bloodID == 10) {
-                        System.out.println("--------------------------------");
-                        System.out.printf("Environment:           %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
-                        System.out.printf("BloodUnit ID:          %s\n", bloodUnit.bloodID);
-                        System.out.printf("BloodUnit o2:          %.2f\n", bloodUnit.getPo2());
-                        System.out.printf("BloodUnit co2:         %.2f\n", bloodUnit.getPco2());
-                        System.out.printf("Times diffused:        %d\n", bloodUnit.getTimesDiffused());
-//                        System.out.printf("o2 difference:         %.2f\n", o2Difference);
-//                        System.out.printf("co2 difference:        %.2f\n", co2Difference);
-                        System.out.println("--------------------------------");
+//                        System.out.println("--------------------------------");
+//                        System.out.printf("Environment:           %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);
+//                        System.out.printf("BloodUnit ID:          %s\n", bloodUnit.bloodID);
+//                        System.out.printf("BloodUnit o2:          %.2f\n", bloodUnit.getPo2());
+//                        System.out.printf("BloodUnit co2:         %.2f\n", bloodUnit.getPco2());
+//                        System.out.printf("Times diffused:        %d\n", bloodUnit.getTimesDiffused());
+////                        System.out.printf("o2 difference:         %.2f\n", o2Difference);
+////                        System.out.printf("co2 difference:        %.2f\n", co2Difference);
+//                        System.out.println("--------------------------------");
                         String tempBloodUnitString = "";
                         tempBloodUnitString += String.format("--------------------------------\n");
                         tempBloodUnitString += String.format("Environment:           %d. %s\n", bloodUnit.getCurrentEnvironment().bloodEnvID, bloodUnit.getCurrentEnvironment().name);

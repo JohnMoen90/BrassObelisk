@@ -8,13 +8,14 @@ public class displayGUI extends JFrame{
     private JLabel arterialCO2Label;
     private JLabel venousO2Label;
     private JLabel venousCO2Label;
-    private JLabel o2ConsumptionLabel;
     private JLabel co2ConsumptionLabel;
     private JLabel totalO2BurnedLabel;
     private JLabel totalCO2ProducedLabel;
     private JLabel breathStatusLabel;
     private JLabel o2InLungsLabel;
     private JLabel co2InLungsLabel;
+    private JLabel HeaderStringLabel;
+    private JTextArea cnsTextArea;
     private ArrayList<JLabel> allLabels;
 
 
