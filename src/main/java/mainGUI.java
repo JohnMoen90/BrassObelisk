@@ -1,4 +1,3 @@
-import javax.print.attribute.standard.NumberUp;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,9 +15,9 @@ public class mainGUI extends JFrame {
     private JButton StartButton;
     private JCheckBox smokerCheckBox;
     private JTextField ageTextField;
-    private JComboBox profilesComboBox;
+    private JComboBox<String> profilesComboBox;
     private JButton saveNewProfileButton;
-    private JTextField firstNameTextField;
+    private JTextField profileNameTextField;
     private JTextField lastNameTextField;
     private JTextField bodyWeightTextField;
     private JButton exitProgramButton;
@@ -53,6 +52,8 @@ public class mainGUI extends JFrame {
         for (String option : phyTrainingOptions) {
             phyTrainingComboBox.addItem(option);
         }
+
+        setProfileComboBox();
 
         // Basically controls how fast each component of the simulation runs
         new Timer(100, new ActionListener() {
@@ -90,30 +91,51 @@ public class mainGUI extends JFrame {
 
         });
 
-        exitProgramButton.addActionListener(e -> {
+        saveNewProfileButton.addActionListener(e -> {
+            addNewProfile();
+        });
+
+        profilesComboBox.addActionListener(e -> {
+            setProfileComboBox();
+            for (Profile profile: profiles) {
+                if (profile.getProfileName().equals(profilesComboBox.getSelectedItem())) {
+                    profileNameTextField.setText(profile.getProfileName());
+                    ageTextField.setText(String.format("%d",profile.getAge()));
+                    bodyWeightTextField.setText(String.format("%d",profile.getWeight()));
+                    phyTrainingComboBox.setSelectedIndex(profile.getFitnessLevel());
+                    smokerCheckBox.setSelected(profile.isSmoker());
+                }
+            }
 
         });
 
     }
 
-
-    public void addNewProile() {
-
-        try {
-            int age = Integer.parseInt(ageTextField.getText());
-            int weight = Integer.parseInt(ageTextField.getText());
-            profiles.add(new Profile(
-                    firstNameTextField.getText(),
-                    lastNameTextField.getText(),
-                    age,
-                    weight,
-                    phyTrainingComboBox.getSelectedIndex(),
-                    smokerCheckBox.isSelected()));
+    private void setProfileComboBox() {
+        for (Profile profile: profiles) {
+            profilesComboBox.addItem(profile.getProfileName());
         }
-        catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(rootPane,"Please only use numeric fields in age and weight fields");
-        }
+    }
 
+
+    public void addNewProfile() {
+
+        if (profileNameTextField.getText().equals("") || ageTextField.getText().equals(""))
+            JOptionPane.showMessageDialog(rootPane, "Please fill all fields before saving.");
+        else {
+            try {
+                int age = Integer.parseInt(ageTextField.getText());
+                int weight = Integer.parseInt(ageTextField.getText());
+                profiles.add(new Profile(
+                        profileNameTextField.getText(),
+                        age,
+                        weight,
+                        phyTrainingComboBox.getSelectedIndex(),
+                        smokerCheckBox.isSelected()));
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(rootPane, "Please use numeric characters in age and weight fields.");
+            }
+        }
     }
 
 

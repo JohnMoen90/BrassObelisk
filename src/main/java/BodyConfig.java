@@ -1,16 +1,21 @@
 public class BodyConfig {
 
 
+    // Main variables
+    static double bodyWeight = 70.0; // kg
+    static int age;
+    static int fitnessLevel;
+    static String exerciseXP;
+
+
     // lets try again
     static double initVO2 = -40;
     static double initVCO2= 5;
     static double initLungO2 = 40;
     static double initLungCO2 = -5;
 
-    static String exerciseXP;
 
     // Basic starting values for simulation, templates will be loaded here
-    static double bodyWeight = 70.0; // kg
     static double strokeVolume = 70.0; // ml
 
     // Derived Stats

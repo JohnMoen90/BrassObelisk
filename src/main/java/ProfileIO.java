@@ -8,7 +8,7 @@ public class ProfileIO {
 
     static public ArrayList<Profile> getAllProfiles() {
 
-        final String getAllSql = "SELECT * FROM user_profiles ORDER BY first_name";
+        final String getAllSql = "SELECT * FROM user_profiles ORDER BY profile_name";
         ArrayList<Profile> allProfiles = new ArrayList<>();
 
         try (Connection connection = DriverManager.getConnection(DB_URL);
@@ -18,8 +18,7 @@ public class ProfileIO {
 
             while (resultSet.next()) {
                 allProfiles.add(new Profile(
-                        resultSet.getString("first_name"),
-                        resultSet.getString("last_name"),
+                        resultSet.getString("profile_name"),
                         resultSet.getInt("age"),
                         resultSet.getInt("weight"),
                         resultSet.getInt("fitness_lvl"),
@@ -38,16 +37,15 @@ public class ProfileIO {
 
     public boolean addNewProfile(Profile profile) {
 
-        final String addProfileSql = "INSERT INTO user_profiles VALUES (?, ?, ?, ?, ?, ?)";
+        final String addProfileSql = "INSERT INTO user_profiles VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement addProfilePS = conn.prepareStatement(addProfileSql)) {
-            addProfilePS.setString(1, profile.getFirstName());
-            addProfilePS.setString(2, profile.getLastName());
-            addProfilePS.setInt(3, profile.getAge());
-            addProfilePS.setInt(4, profile.getWeight());
-            addProfilePS.setInt(5, profile.getFitnessLevel());
-            addProfilePS.setBoolean(6, profile.isSmoker());
+            addProfilePS.setString(1, profile.getProfileName());
+            addProfilePS.setInt(2, profile.getAge());
+            addProfilePS.setInt(3, profile.getWeight());
+            addProfilePS.setInt(4, profile.getFitnessLevel());
+            addProfilePS.setBoolean(5, profile.isSmoker());
             addProfilePS.execute();
 
         } catch (SQLException sqle) {

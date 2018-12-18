@@ -1,16 +1,14 @@
 public class Profile {
 
-    private String firstName;
-    private String lastName;
+    private String profileName;
     private int age;
     private int weight;
     private int fitnessLevel;
     private boolean smoker;
 
-    Profile(String firstName, String lastName, int age, int weight, int fitnessLevel, boolean smoker){
+    Profile(String profileName, int age, int weight, int fitnessLevel, boolean smoker){
 
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.profileName = profileName;
         this.age = age;
         this.weight = weight;
         this.fitnessLevel = fitnessLevel;
@@ -18,21 +16,14 @@ public class Profile {
     }
 
 
-    public String getFirstName() {
-        return firstName;
+    public String getProfileName() {
+        return profileName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setProfileName(String profileName) {
+        this.profileName = profileName;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
 
     public int getAge() {
         return age;
