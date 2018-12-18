@@ -232,7 +232,7 @@
               <text value="VO2 per BU (mmHg)"/>
             </properties>
           </component>
-          <component id="2b084" class="javax.swing.JLabel" binding="ActivityLevelLabel">
+          <component id="2b084" class="javax.swing.JLabel" binding="activityLevelLabel">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>

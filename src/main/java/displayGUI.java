@@ -23,7 +23,7 @@ public class displayGUI extends JFrame{
     private JLabel alveolarVentilationLabel;
     private JLabel lungO2AssignerLabel;
     private JLabel lungCO2AssignerLabel;
-    private JLabel ActivityLevelLabel;
+    private JLabel activityLevelLabel;
     private JLabel diffZoneO2AssignerLabel;
     private JLabel beatsPerMinuteLabel;
     private JLabel diffZoneCO2AssignerLabel;
@@ -73,9 +73,6 @@ public class displayGUI extends JFrame{
 
         getReadings();
 
-
-
-
     }
 
 
@@ -98,7 +95,9 @@ public class displayGUI extends JFrame{
             bloodUnitTextArea.setText(body.bloodReadings().getBloodUnitString(10));
             cnsTextArea.setText(body.cnsReadings().getCNSText());
 
-            diffZoneO2AssignerLabel.setText(String.format("%.2f",body.bloodReadings().getDiffusionZoneAssigners(2, "o2")));
+            activityLevelLabel.setText(activityLevelToString());
+//            diffZoneO2AssignerLabel.setText(String.format("%.2f",body.bloodReadings().getDiffusionZoneAssigners(2, "o2")));
+            diffZoneO2AssignerLabel.setText(String.format("%.2f",BodyConfig.currentVO2));
             diffZoneCO2AssignerLabel.setText(String.format("%.2f",body.bloodReadings().getDiffusionZoneAssigners(2, "co2")));
 
 
@@ -110,4 +109,19 @@ public class displayGUI extends JFrame{
             lungCO2AssignerLabel.setText(String.format("%.2f",body.bloodReadings().getDiffusionZoneAssigners(4, "co2")));
         }
     }
+
+    public String activityLevelToString(){
+        if (BodyConfig.activityLevel == 1) {
+            return "Rest";
+        } else if (BodyConfig.activityLevel < 4) {
+            return "Mild";
+        } else if (BodyConfig.activityLevel < 7) {
+            return "Moderate";
+        } else if (BodyConfig.activityLevel < 10) {
+            return "Strenuous";
+        } else {
+            return "Peak";
+        }
+    }
+
 }

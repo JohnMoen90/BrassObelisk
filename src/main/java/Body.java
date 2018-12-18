@@ -70,6 +70,7 @@ public class Body {
     public void calculateGasAssignment(){
         changeAssignersCounter++;
         if (changeAssignersCounter == 10) {
+            changeAssignersCounter = 0;
             setMetabolicRate();
             cns.resolveImbalance();
         }
@@ -77,14 +78,22 @@ public class Body {
     }
 
     public void setMetabolicRate(){
-
+        setVO2();
+        System.out.println("Test w/ kelsey vo2: " + vo2);
+        System.out.println("-vo2 * (1.2 / heart.calculateBeatsPerSecond()) = " + (-vo2 * (1.2 / heart.calculateBeatsPerSecond())));
         blood.setMetabolicRate(
-                -(vo2 /((double)heart.calculateBeatsPerSecond()/1.2)),
+                vo2 * Math.abs(heart.calculateBeatsPerSecond() - 1.2),
                 vo2 /(calculateVco2()));
+        BodyConfig.currentVO2 = -vo2 * (1.2 / heart.calculateBeatsPerSecond());
+
+    }
+
+    private void setVO2() {
+        vo2 = BodyConfig.initVO2 * (1 +(.15 * BodyConfig.fitnessLevel));
     }
 
     public double calculateVco2(){
-        return (vo2/((double)heart.calculateBeatsPerSecond()/1.2)) * .125;
+        return (vo2 * (1.2 / heart.calculateBeatsPerSecond())) * .125;
     }
 
     public boolean isSmoker() {
@@ -96,10 +105,6 @@ public class Body {
     }
 
 
-    public void setActivityLevel(int activityLevel) {
-
-        setMetabolicRate();
-    }
 
     public double getFitnessLevelMulitiplier() {
 
@@ -175,7 +180,7 @@ public class Body {
             if (!breathHeld) {
 
                 // Set breath size and counter
-                breathLength = (600 / respiratoryRate) * .5; // <-- converting from min to 10ths of a second
+                breathLength = (600/respiratoryRate) * .5; // <-- converting from min to 10ths of a second
                 breathCounter++;
 
                 // If
@@ -284,7 +289,7 @@ public class Body {
      */
     public class Heart{
 
-        private int beatsPerMinute = 70; // BeatsPerMinute
+        private int beatsPerMinute; // BeatsPerMinute
         private int heartRate; // milliseconds
         private int bloodPumpCounter;
 
@@ -293,12 +298,15 @@ public class Body {
         Heart(Blood blood) {
             this.blood = blood;
             heartRate = calculateHeartRate();
+            beatsPerMinute = 70;
             bloodPumpCounter = 0;
         }
 
         public void pumpBlood(){
             // Controls speed of heart pumping
             bloodPumpCounter++;
+
+            System.out.println("HeartRateperTick: " + calculateHeartRate() );
             if (bloodPumpCounter >= calculateHeartRate()) {
                 bloodPumpCounter -= calculateHeartRate();
                 blood.circulate();
@@ -312,7 +320,7 @@ public class Body {
          * @return
          */
         private int calculateHeartRate(){   // <-- Float is fine here since the evaluation is >=
-            return (600 / beatsPerMinute);
+            return (beatsPerMinute /60) * 10;
         }
         private int calculateBeatsPerSecond(){return (beatsPerMinute / 60);}
 
@@ -360,12 +368,14 @@ public class Body {
             if (arterialO2 < 95) {
                 lungs.respiratoryDepth += .19;
                 cnsString += "Increasing Respiratory Depth\n";
-            } else if (arterialO2 > 99) {
+            }
+
+            if (arterialO2 > 99 && lungs.respiratoryDepthSetPoint < lungs.respiratoryDepth) {
                 lungs.respiratoryDepth -= .19;
                 cnsString += "Decreasing Respiratory Depth\n";
             }
 
-            if (arterialO2 < 85) {
+            if (arterialO2 < 85 && lungs.respiratoryRateSetPoint < lungs.respiratoryRate) {
                 lungs.respiratoryRate++;
                 cnsString += "Increasing Respiratory Rate\n";
             } else if (arterialO2 > 92) {

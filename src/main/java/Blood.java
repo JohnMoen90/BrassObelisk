@@ -520,6 +520,7 @@ public class Blood {
         public void setGasAssigner(String gasToAssign, double assignmentValue) {
             if (gasToAssign.equals("o2")) {
                 o2Assigner = assignmentValue;
+                System.out.println(assignmentValue);
             } else {
                 co2Assigner = assignmentValue;
             }

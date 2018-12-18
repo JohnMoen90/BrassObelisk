@@ -21,6 +21,7 @@ public class mainGUI extends JFrame {
     private JTextField lastNameTextField;
     private JTextField bodyWeightTextField;
     private JButton deleteProfileButton;
+    private JSlider activityLevelSlider;
     private JButton exitProgramButton;
     private boolean running;
 
@@ -74,6 +75,9 @@ public class mainGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (running) {
+                    if (BodyConfig.activityLevel != activityLevelSlider.getValue()) {
+                        BodyConfig.activityLevel = activityLevelSlider.getValue();
+                    }
                     body.manageTurn();
                     displayGUI.getReadings();
                 }

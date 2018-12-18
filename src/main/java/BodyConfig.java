@@ -6,6 +6,8 @@ public class BodyConfig {
     static int age;
     static int fitnessLevel;
     static String exerciseXP;
+    static int activityLevel;
+    static double currentVO2;
 
 
     // lets try again
@@ -62,6 +64,8 @@ public class BodyConfig {
         bodyWeight = selectedProfile.getWeight(); // kg
         age = selectedProfile.getAge();
         fitnessLevel = selectedProfile.getFitnessLevel();
+        activityLevel = 0;
+        currentVO2 = 40;
 
 
     }
